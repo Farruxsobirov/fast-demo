@@ -161,6 +161,18 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 .how code { font-family: var(--font-mono); font-size: 13px; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; color: var(--ink); white-space: nowrap; }
 .foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: 13px; padding: 22px 0 30px; border-top: 1px solid var(--line); margin-top: 26px; }
 input[type=file] { display: none; }
+.term { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: help; text-decoration: underline dotted; text-decoration-thickness: 1.5px; text-underline-offset: 3px; text-decoration-color: color-mix(in srgb, currentColor 55%, transparent); text-align: inherit; letter-spacing: inherit; text-transform: inherit; }
+.term:hover, .term[aria-expanded="true"] { text-decoration-style: solid; text-decoration-color: var(--warm); }
+#tip { position: fixed; z-index: 50; width: min(340px, calc(100vw - 24px)); background: var(--ink); color: #e9eef6; border-radius: 12px; padding: 14px 16px 15px; box-shadow: 0 12px 32px rgba(14, 26, 43, .28); font-size: 14px; line-height: 1.55; text-transform: none; letter-spacing: normal; }
+#tip[hidden] { display: none; }
+#tip .tt { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: #fff; margin: 0 26px 6px 0; }
+#tip .tb { margin: 0; }
+#tip .tf { font-family: var(--font-mono); font-size: 12.5px; background: rgba(255,255,255,.08); border-radius: 8px; padding: 7px 9px; margin-top: 9px; color: #fff; }
+#tip .tx { position: absolute; top: 8px; right: 8px; width: 26px; height: 26px; border: 0; border-radius: 6px; background: transparent; color: #aab6c8; font-size: 18px; line-height: 1; cursor: pointer; }
+#tip .tx:hover { background: rgba(255,255,255,.1); color: #fff; }
+#tip::before { content: ""; position: absolute; left: var(--ax, 24px); width: 12px; height: 12px; background: var(--ink); transform: rotate(45deg); }
+#tip.below::before { top: -6px; } #tip.above::before { bottom: -6px; }
+.hint-terms { font-size: 12.5px; color: var(--muted); margin: 10px 0 0; }
 :focus-visible { outline: 3px solid #8fb0ff; outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -176,7 +188,7 @@ input[type=file] { display: none; }
       </svg>
       <div>
         <div class="name">FAST</div>
-        <div class="sub">Features from Accelerated Segment Test</div>
+        <div class="sub"><button type="button" class="term" data-term="fast">Features from Accelerated Segment Test</button></div>
       </div>
     </div>
     <nav class="links">
@@ -186,10 +198,11 @@ input[type=file] { display: none; }
   </header>
 
   <section class="hero">
-    <h1>Piksel atrofidagi 16 ta nuqtaga qarab, <em>burchakni</em> millisekundlarda <b>topamiz</b></h1>
+    <h1>Piksel atrofidagi <button type="button" class="term" data-term="aylana">16 ta nuqtaga</button> qarab, <em><button type="button" class="term" data-term="burchak">burchakni</button></em> <button type="button" class="term" data-term="ms">millisekundlarda</button> <b>topamiz</b></h1>
     <div>
-      <p>Rasm yuklang, chegarani o‘zgartiring va istalgan pikselga bosib, algoritm qaror qabul qilishini lupada kuzating. Barcha hisob-kitob brauzeringizda bajariladi.</p>
-      <div class="steps"><span>1 · 16 pikselli aylana</span><span>2 · segment test</span><span>3 · NMS</span></div>
+      <p>Rasm yuklang, <button type="button" class="term" data-term="t">chegarani</button> o‘zgartiring va istalgan pikselga bosib, algoritm qaror qabul qilishini <button type="button" class="term" data-term="lupa">lupada</button> kuzating. Barcha hisob-kitob brauzeringizda bajariladi.</p>
+      <p class="hint-terms">Nuqtali tagchiziqli atamalarni bosing: izoh chiqadi.</p>
+      <div class="steps"><span>1 · <button type="button" class="term" data-term="aylana">16 pikselli aylana</button></span><span>2 · <button type="button" class="term" data-term="segment">segment test</button></span><span>3 · <button type="button" class="term" data-term="nms">NMS</button></span></div>
     </div>
   </section>
 
@@ -210,13 +223,13 @@ input[type=file] { display: none; }
         <div class="tag" id="tag">pikselga bosing</div>
       </div>
       <div class="readouts">
-        <div class="ro"><b class="kp" id="sCount">0</b><small>topilgan burchaklar</small></div>
-        <div class="ro"><b id="sTime">0</b><small>hisoblash vaqti, ms</small></div>
-        <div class="ro"><b id="sPass">–</b><small>tezkor testdan o‘tdi (N = 12)</small></div>
-        <div class="ro"><b id="sSize">0×0</b><small>tasvir o‘lchami, piksel</small></div>
+        <div class="ro"><b class="kp" id="sCount">0</b><small>topilgan <button type="button" class="term" data-term="burchak">burchaklar</button></small></div>
+        <div class="ro"><b id="sTime">0</b><small><button type="button" class="term" data-term="ms">hisoblash vaqti, ms</button></small></div>
+        <div class="ro"><b id="sPass">–</b><small><button type="button" class="term" data-term="tezkor">tezkor testdan</button> o‘tdi (N = 12)</small></div>
+        <div class="ro"><b id="sSize">0×0</b><small>tasvir o‘lchami, <button type="button" class="term" data-term="piksel">piksel</button></small></div>
       </div>
       <div class="chart">
-        <div class="head"><p class="label" style="margin:0">Chegara t va burchaklar soni</p><span id="curveNote">hisoblanmoqda…</span></div>
+        <div class="head"><p class="label" style="margin:0"><button type="button" class="term" data-term="t">Chegara t</button> va burchaklar soni</p><span><span id="curveNote">hisoblanmoqda…</span> · <button type="button" class="term" data-term="log">logarifmik shkala</button></span></div>
         <svg id="curve" viewBox="0 0 800 150" role="img" aria-label="Threshold qiymatiga qarab burchaklar soni grafigi"></svg>
       </div>
     </section>
@@ -225,27 +238,27 @@ input[type=file] { display: none; }
       <section class="card pad">
         <p class="label">Parametrlar</p>
         <div class="ctl">
-          <div class="row1"><label for="t">Chegara t</label><output id="tOut">25</output></div>
+          <div class="row1"><label for="t"><button type="button" class="term" data-term="t">Chegara t</button></label><output id="tOut">25</output></div>
           <input type="range" id="t" min="5" max="100" step="1" value="25">
-          <div class="note">Aylana pikseli markazdan kamida t ga farq qilsa, “yorqinroq” yoki “qorong‘iroq” hisoblanadi.</div>
+          <div class="note">Aylana pikseli markazdan kamida t ga farq qilsa, <button type="button" class="term" data-term="yorqin">yorqinroq</button> yoki <button type="button" class="term" data-term="qorongi">qorong‘iroq</button> hisoblanadi.</div>
         </div>
         <div class="ctl">
-          <div class="row1"><span class="t" id="nLabel">Ketma-ket piksellar N</span><output id="nOut">9</output></div>
+          <div class="row1"><span class="t" id="nLabel"><button type="button" class="term" data-term="ketma">Ketma-ket</button> piksellar <button type="button" class="term" data-term="n">N</button></span><output id="nOut">9</output></div>
           <div class="seg" role="group" aria-labelledby="nLabel">
             <button type="button" data-n="9" aria-pressed="true">9</button>
             <button type="button" data-n="10" aria-pressed="false">10</button>
             <button type="button" data-n="11" aria-pressed="false">11</button>
             <button type="button" data-n="12" aria-pressed="false">12</button>
           </div>
-          <div class="note">N = 9 OpenCV standarti. N = 12 da tezkor test (1, 5, 9, 13-piksellar) ishlaydi.</div>
+          <div class="note">N = 9 <button type="button" class="term" data-term="opencv">OpenCV</button> standarti. N = 12 da <button type="button" class="term" data-term="tezkor">tezkor test</button> (1, 5, 9, 13-piksellar) ishlaydi.</div>
         </div>
         <div class="ctl">
-          <div class="row1"><label for="noise">Gauss shovqini σ</label><output id="noiseOut">0</output></div>
+          <div class="row1"><label for="noise"><button type="button" class="term" data-term="noise">Gauss shovqini σ</button></label><output id="noiseOut">0</output></div>
           <input type="range" id="noise" min="0" max="30" step="1" value="0">
         </div>
         <div class="switches">
-          <label class="sw"><span>Non-Maximum Suppression<small>yopishgan nuqtalardan eng kuchlisini qoldiradi</small></span><input type="checkbox" id="nms" checked></label>
-          <label class="sw"><span>Gauss filtri (5×5)<small>shovqinni oldindan silliqlaydi</small></span><input type="checkbox" id="blur"></label>
+          <label class="sw"><span><button type="button" class="term" data-term="nms">Non-Maximum Suppression</button><small>yopishgan nuqtalardan eng kuchlisini qoldiradi</small></span><input type="checkbox" id="nms" checked></label>
+          <label class="sw"><span><button type="button" class="term" data-term="blur">Gauss filtri (5×5)</button><small>shovqinni oldindan silliqlaydi</small></span><input type="checkbox" id="blur"></label>
           <label class="sw"><span>Burchaklarni ko‘rsatish</span><input type="checkbox" id="show" checked></label>
         </div>
         <div class="hr"></div>
@@ -260,7 +273,7 @@ input[type=file] { display: none; }
       </section>
 
       <section class="card pad">
-        <p class="label">Lupa: tanlangan piksel</p>
+        <p class="label"><button type="button" class="term" data-term="lupa">Lupa</button>: tanlangan piksel</p>
         <div class="loupe-top">
           <canvas id="zoom" width="560" height="560" aria-label="Tanlangan piksel atrofi, 7×7"></canvas>
           <div class="loupe-info">
@@ -270,12 +283,12 @@ input[type=file] { display: none; }
         </div>
         <div class="ring">
           <div class="cells" id="cells"></div>
-          <div class="cap"><span>aylana piksellari 1 → 16 (16-dan keyin yana 1 keladi)</span><span id="runCap"></span></div>
+          <div class="cap"><span><button type="button" class="term" data-term="aylana">aylana piksellari</button> 1 → 16 (16-dan keyin yana 1 keladi)</span><span id="runCap"></span></div>
         </div>
         <div class="legend">
-          <span><i style="background:var(--warm)"></i>yorqinroq</span>
-          <span><i style="background:var(--cool)"></i>qorong‘iroq</span>
-          <span><i style="background:var(--same)"></i>o‘xshash</span>
+          <span><i style="background:var(--warm)"></i><button type="button" class="term" data-term="yorqin">yorqinroq</button></span>
+          <span><i style="background:var(--cool)"></i><button type="button" class="term" data-term="qorongi">qorong‘iroq</button></span>
+          <span><i style="background:var(--same)"></i><button type="button" class="term" data-term="oxshash">o‘xshash</button></span>
         </div>
         <div class="calc" id="calc"></div>
       </section>
@@ -285,10 +298,10 @@ input[type=file] { display: none; }
   <section class="how">
     <h2>Algoritm qanday ishlaydi</h2>
     <div class="grid">
-      <div class="card step"><div class="num">01</div><h3>16 pikselli aylana</h3><p>Har bir p piksel atrofida radiusi 3 bo‘lgan Bresenham aylanasi olinadi. Unda aynan 16 ta piksel bor, ular tepadan soat strelkasi bo‘yicha raqamlanadi.</p></div>
-      <div class="card step"><div class="num">02</div><h3>Uch sinf</h3><p>Har bir aylana pikseli markaz bilan solishtiriladi: <code>I &gt; I<sub>p</sub>+t</code> yorqinroq, <code>I &lt; I<sub>p</sub>−t</code> qorong‘iroq, qolgani o‘xshash. Hosila ham, matritsa ham hisoblanmaydi.</p></div>
-      <div class="card step"><div class="num">03</div><h3>Segment test</h3><p>Aylanada ketma-ket kamida N ta piksel bir xil sinfda bo‘lsa, p burchak hisoblanadi. Tekis sohada bunday ketma-ketlik yo‘q, to‘g‘ri chiziq ustida esa aylananing faqat yarmi farq qiladi.</p></div>
-      <div class="card step"><div class="num">04</div><h3>Javob va NMS</h3><p>Har bir burchakka <code>V = max(Σ(I−I<sub>p</sub>−t), Σ(I<sub>p</sub>−I−t))</code> javobi beriladi. 3×3 oynada eng katta javobli nuqta qoladi, qo‘shnilari o‘chiriladi.</p></div>
+      <div class="card step"><div class="num">01</div><h3><button type="button" class="term" data-term="aylana">16 pikselli aylana</button></h3><p>Har bir p piksel atrofida radiusi 3 bo‘lgan <button type="button" class="term" data-term="aylana">Bresenham aylanasi</button> olinadi. Unda aynan 16 ta piksel bor, ular tepadan soat strelkasi bo‘yicha raqamlanadi.</p></div>
+      <div class="card step"><div class="num">02</div><h3><button type="button" class="term" data-term="sinf">Uch sinf</button></h3><p>Har bir aylana pikseli markaz bilan solishtiriladi: <code>I &gt; I<sub>p</sub>+t</code> yorqinroq, <code>I &lt; I<sub>p</sub>−t</code> qorong‘iroq, qolgani o‘xshash. <button type="button" class="term" data-term="harris">Hosila ham, matritsa ham</button> hisoblanmaydi.</p></div>
+      <div class="card step"><div class="num">03</div><h3><button type="button" class="term" data-term="segment">Segment test</button></h3><p>Aylanada ketma-ket kamida N ta piksel bir xil sinfda bo‘lsa, p burchak hisoblanadi. Tekis sohada bunday ketma-ketlik yo‘q, to‘g‘ri chiziq ustida esa aylananing faqat yarmi farq qiladi.</p></div>
+      <div class="card step"><div class="num">04</div><h3><button type="button" class="term" data-term="javob">Javob</button> va <button type="button" class="term" data-term="nms">NMS</button></h3><p>Har bir burchakka <code>V = max(Σ(I−I<sub>p</sub>−t), Σ(I<sub>p</sub>−I−t))</code> javobi beriladi. 3×3 oynada eng katta javobli nuqta qoladi, qo‘shnilari o‘chiriladi.</p></div>
     </div>
   </section>
 
@@ -297,6 +310,8 @@ input[type=file] { display: none; }
     <span>Manba: E. Rosten, T. Drummond, “Machine Learning for High-Speed Corner Detection”, ECCV 2006</span>
   </footer>
 </div>
+
+<div id="tip" role="dialog" aria-live="polite" hidden><button type="button" class="tx" aria-label="Yopish">×</button><p class="tt"></p><p class="tb"></p><div class="tf" hidden></div></div>
 
 <script>
 (() => {
@@ -309,6 +324,63 @@ input[type=file] { display: none; }
   const zoom = $('zoom'), zctx = zoom.getContext('2d');
   const S = { t: 25, N: 9, noise: 0, nms: true, blur: false, show: true };
   let W = 0, H = 0, base = null, gray = null, kps = [], sel = null, curveJob = 0;
+
+
+  // ---------- atamalar lug'ati (tooltiplar) ----------
+  const tb = (k, html) => `<button type="button" class="term" data-term="${k}">${html}</button>`;
+  const CLS = ['Uch sinf', 'Aylanadagi har bir piksel markaz bilan solishtirilib, uch sinfdan biriga ajratiladi. Faqat bir xil sinfdagi (hammasi yorqinroq yoki hammasi qorong‘iroq) piksellar ketma-ketligi hisobga olinadi; o‘xshash piksel ketma-ketlikni uzadi.', 'yorqinroq:   I > Iₚ + t\nqorong‘iroq: I < Iₚ − t\no‘xshash:    Iₚ − t ≤ I ≤ Iₚ + t'];
+  const GLOSS = {
+    fast: ['FAST', 'Features from Accelerated Segment Test. 2006-yilda E. Rosten va T. Drummond taklif qilgan burchak detektori. U hosila yoki matritsa hisoblamaydi, faqat piksel atrofidagi 16 ta yorqinlikni markaz bilan solishtiradi. Shu sababli Harris’dan taxminan 9, Shi-Tomasi’dan 12 marta tez ishlaydi.'],
+    burchak: ['Burchak (muhim nuqta)', 'Yorqinlik bir nechta yo‘nalishda keskin o‘zgaradigan joy. Uni boshqa rakursdan olingan tasvirda ham ishonchli topish mumkin, shuning uchun burchaklar panorama yasash, obyektni kuzatish (tracking) va SLAM’da tayanch nuqta bo‘ladi. Inglizchasi: keypoint, corner.'],
+    aylana: ['Bresenham aylanasi (16 piksel)', 'Radiusi 3 piksel bo‘lgan, piksellar to‘riga moslashtirilgan aylana. U aynan 16 pikseldan iborat. 1-piksel tepada, qolganlari soat strelkasi bo‘yicha raqamlanadi; aylana yopiq, ya’ni 16-dan keyin yana 1 keladi.', '1 → tepada (0, −3)   5 → o‘ngda (3, 0)\n9 → pastda (0, 3)   13 → chapda (−3, 0)'],
+    segment: ['Segment test', 'FAST’ning asosiy sharti. Aylanada ketma-ket kamida N ta piksel hammasi yorqinroq yoki hammasi qorong‘iroq bo‘lsa, p burchak hisoblanadi. Tekis sohada bunday yoy bo‘lmaydi, to‘g‘ri chiziq (qirra) ustida esa aylananing faqat yarmiga yaqini farq qiladi.'],
+    t: ['Chegara t (threshold)', 'Yorqinlik farqi qachon “sezilarli” hisoblanishini belgilaydi. Katta t: faqat kontrastli burchaklar qoladi, nuqtalar kam. Kichik t: nuqtalar ko‘p, ular orasida tekstura va shovqin ham bo‘ladi. Amalda odatda 20–40 olinadi; OpenCV’da standart qiymat 10.'],
+    n: ['N: ketma-ket piksellar soni', 'Aylanada bir xil sinfda ketma-ket turishi kerak bo‘lgan piksellar soni. N = 9 (FAST-9) eng yaxshi takrorlanuvchanlikni beradi va OpenCV standarti hisoblanadi. N = 12 qattiqroq: faqat o‘tkir burchaklar qoladi, nuqtalar taxminan ikki baravar kamayadi.'],
+    ketma: ['Ketma-ket', 'Aylanada bir-biriga tegib turgan piksellar. Aylana yopiq bo‘lgani uchun 15, 16, 1, 2 ham ketma-ket hisoblanadi. Lupa ostidagi 16 katakli tasmada eng uzun ketma-ketlik ramka bilan belgilangan.'],
+    tezkor: ['Tezkor test (high-speed test)', 'N = 12 bo‘lganda avval faqat 1, 5, 9 va 13-piksellar tekshiriladi. Ulardan kamida 3 tasi shartni bajarmasa, piksel to‘liq tekshiruvsiz darhol rad etiladi. Odatda piksellarning 95 foizdan ko‘pi shu 4 ta solishtirishda tashlanadi; FAST’ning tezligi shundan.'],
+    nms: ['Non-Maximum Suppression (NMS)', 'Bitta burchak atrofida bir nechta qo‘shni piksel ham shartni bajaradi va nuqtalar to‘dasi hosil bo‘ladi. NMS har bir 3×3 sohada faqat javobi (V) eng katta nuqtani qoldiradi. Nuqtalar soni odatda 2–8 marta kamayadi.'],
+    javob: ['Javob (score) V', 'Burchak qanchalik “kuchli” ekanini o‘lchaydigan son. Yorqinroq va qorong‘iroq piksellar bo‘yicha farqlar alohida yig‘iladi, kattasi olinadi. NMS aynan shu qiymatlarni solishtiradi.', 'V = max( Σ(I − Iₚ − t),  Σ(Iₚ − I − t) )'],
+    noise: ['Gauss shovqini σ', 'Har bir pikselga o‘rtachasi 0, standart chetlanishi σ bo‘lgan tasodifiy son qo‘shiladi; kamera sensori shovqinini taqlid qiladi. FAST faqat 16 pikselga qaragani uchun shovqinga sezgir: σ = 20 da soxta nuqtalar soni bir necha marta oshadi.'],
+    blur: ['Gauss filtri', 'Har bir pikselni qo‘shnilarining Gauss vaznli o‘rtachasiga almashtiradi (bu yerda 5×5 yadro, σ = 1,2). Shovqinni silliqlab, soxta nuqtalarni yo‘qotadi, ammo kuchsiz haqiqiy burchaklar ham yo‘qolishi mumkin.'],
+    ip: ['Iₚ: markaziy piksel yorqinligi', 'Tekshirilayotgan p pikselning kulrang qiymati: 0 qora, 255 oq. Rangli rasm avval kulrangga o‘tkaziladi.', 'I = 0,299·R + 0,587·G + 0,114·B'],
+    sinf: CLS, yorqin: CLS, qorongi: CLS, oxshash: CLS,
+    lupa: ['Lupa', 'Tanlangan piksel atrofidagi 7×7 soha kattalashtirib ko‘rsatiladi. Har bir katakda yorqinlik qiymati, aylana kataklarida 1–16 raqami va sinf rangi bor. Tasvirdagi istalgan pikselga bosib tanlash mumkin.'],
+    opencv: ['OpenCV', 'Kompyuter ko‘rishining eng mashhur ochiq kutubxonasi (C++ va Python). Unda FAST cv2.FastFeatureDetector_create() orqali chaqiriladi. Bu sahifadagi algoritm OpenCV bilan tekshirilgan: NMS’siz holatda natijalar 100% mos.'],
+    log: ['Logarifmik shkala', 'O‘qdagi har bir bo‘lim 10 baravar o‘sishni bildiradi: 1, 10, 100, 1000. Burchaklar soni t ga qarab o‘nlab va minglab marta o‘zgargani uchun oddiy shkalada kichik qiymatlar ko‘rinmay qoladi.'],
+    ms: ['Hisoblash vaqti, ms', 'FAST’ning shu brauzerda JavaScript’da bajarilish vaqti (1 ms = 0,001 s). Taqqoslash uchun: 30 kadr/s videoda bitta kadrga taxminan 33 ms vaqt bor. C++ dagi OpenCV versiyasi bundan ham tezroq.'],
+    piksel: ['Piksel', 'Raqamli tasvirning eng kichik elementi. Kulrang tasvirda har bir piksel 0 dan 255 gacha bitta yorqinlik qiymatiga ega. Tezlik uchun katta rasmlar uzun tomoni 900 pikselgacha kichraytiriladi.'],
+    harris: ['Klassik detektorlar bilan farqi', 'Harris va Shi-Tomasi har bir piksel uchun gradientlar va 2×2 struktura matritsasini hisoblaydi (R = det M − k·trace² M). FAST esa faqat yorqinliklarni solishtiradi, shuning uchun bir necha baravar tez.'],
+  };
+  const tip = $('tip'); let tipFor = null;
+  function closeTip() { if (tipFor) tipFor.setAttribute('aria-expanded', 'false'); tip.hidden = true; tipFor = null; }
+  function openTip(el) {
+    const g = GLOSS[el.dataset.term]; if (!g) return;
+    if (tipFor === el) { closeTip(); return; }
+    closeTip(); tipFor = el; el.setAttribute('aria-expanded', 'true');
+    tip.querySelector('.tt').textContent = g[0];
+    tip.querySelector('.tb').textContent = g[1];
+    const f = tip.querySelector('.tf'); f.hidden = !g[2]; f.innerHTML = g[2] ? g[2].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') : '';
+    tip.hidden = false;
+    placeTip();
+  }
+  function placeTip() {
+    if (!tipFor) return;
+    const el = tipFor, r = el.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight, vw = innerWidth, vh = innerHeight;
+    if (r.bottom < 0 || r.top > vh) { closeTip(); return; }
+    let left = Math.min(Math.max(12, r.left + r.width / 2 - tw / 2), vw - tw - 12);
+    const below = r.bottom + th + 14 < vh || r.top < th + 14;
+    tip.className = below ? 'below' : 'above';
+    tip.style.left = left + 'px';
+    tip.style.top = (below ? r.bottom + 10 : r.top - th - 10) + 'px';
+    tip.style.setProperty('--ax', Math.min(tw - 24, Math.max(12, r.left + r.width / 2 - left - 6)) + 'px');
+  }
+  document.addEventListener('click', e => {
+    const el = e.target.closest('.term');
+    if (el) { e.preventDefault(); e.stopPropagation(); openTip(el); return; }
+    if (e.target.closest('.tx') || !e.target.closest('#tip')) closeTip();
+  }, true);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTip(); });
+  addEventListener('scroll', placeTip, { passive: true }); addEventListener('resize', placeTip);
 
   // ---------- namuna tasvir ----------
   function demoImage() {
@@ -502,10 +574,10 @@ input[type=file] { display: none; }
     const isCorner = run >= N;
     const inList = kps.some(k => k[0] === cx && k[1] === cy);
     v.textContent = isCorner ? '● Burchak' : '○ Burchak emas'; v.className = 'verdict ' + (isCorner ? 'yes' : 'no');
-    kv.innerHTML = `<dt>(x, y)</dt><dd>${cx}, ${cy}</dd><dt>I<sub>p</sub></dt><dd>${p}</dd><dt>t</dt><dd>${t}</dd><dt>ketma-ket yorqin</dt><dd>${rb}</dd><dt>ketma-ket qorong‘i</dt><dd>${rd}</dd><dt>kerak (N)</dt><dd>${N}</dd>`;
+    kv.innerHTML = `<dt>(x, y)</dt><dd>${cx}, ${cy}</dd><dt>${tb('ip','I<sub>p</sub>')}</dt><dd>${p}</dd><dt>${tb('t','t')}</dt><dd>${t}</dd><dt>${tb('ketma','ketma-ket')} ${tb('yorqin','yorqin')}</dt><dd>${rb}</dd><dt>${tb('ketma','ketma-ket')} ${tb('qorongi','qorong‘i')}</dt><dd>${rd}</dd><dt>kerak (${tb('n','N')})</dt><dd>${N}</dd>`;
     const runSet = new Set(); if (run > 0) for (let j = 0; j < run; j++) runSet.add((rs + j) % 16);
     $('cells').innerHTML = cls.map((c, k) => `<div class="${c === 's' ? 's' : ''}${runSet.has(k) ? ' run' : ''}" style="background:${c === 'b' ? warm : c === 'd' ? cool : css('--same')}">${k + 1}</div>`).join('');
-    $('runCap').textContent = run ? `eng uzun: ${run} ta ${useB ? 'yorqin' : 'qorong‘i'}` : 'ketma-ketlik yo‘q';
+    $('runCap').innerHTML = run ? `eng uzun: ${run} ta ${useB ? tb('yorqin', 'yorqin') : tb('qorongi', 'qorong‘i')}` : 'ketma-ketlik yo‘q';
     $('calc').innerHTML = `yorqinroq:   I &gt; ${p} + ${t} = ${p + t}<br>qorong‘iroq: I &lt; ${p} − ${t} = ${p - t}<br>shart: ketma-ket ${run} ≥ ${N} → ` +
       (isCorner ? '<span class="ok">bajarildi, burchak</span>' : '<span class="bad">bajarilmadi</span>') +
       (isCorner && S.nms && !inList ? '<br>NMS: yonidagi qo‘shni javobi kattaroq, shu sababli bu nuqta tashlandi' : '');
@@ -544,7 +616,7 @@ input[type=file] { display: none; }
       const t = ts[out.length]; out.push([t, fast(gray, t, S.N, S.nms).pts.length]);
       curveData = out.slice(); drawCurve(curveData);
       if (out.length < ts.length) setTimeout(step, 0);
-      else $('curveNote').textContent = `N = ${S.N}${S.nms ? ', NMS' : ''}${S.noise ? `, σ = ${S.noise}` : ''} · logarifmik shkala`;
+      else $('curveNote').textContent = `N = ${S.N}${S.nms ? ', NMS' : ''}${S.noise ? `, σ = ${S.noise}` : ''}`;
     };
     setTimeout(step, 30);
   }
