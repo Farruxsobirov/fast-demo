@@ -2,6 +2,8 @@
 
 Tasvirdagi muhim nuqtalarni (burchaklarni) **FAST** (Features from Accelerated Segment Test) algoritmi yordamida brauzerning o‘zida aniqlaydigan interaktiv dastur.
 
+**🔗 Jonli sayt: https://fast-demo-pi.vercel.app/**
+
 > «Kompyuter ko‘rishi» fani, 1-mustaqil ish: *«FAST algoritmi yordamida tasvirning muhim nuqtalarini ajratish»*
 > Bajardi: **Sobirov Farrux**, 261-23 SIo‘ guruhi, Muhammad al-Xorazmiy nomidagi TATU
 
@@ -25,7 +27,7 @@ Algoritm JavaScript’da noldan yozilgan. Natijalari OpenCV’dagi `cv2.FastFeat
 
 Hech narsa o‘rnatish shart emas – `index.html` faylini brauzerda ochish kifoya. Dastur internetsiz ham ishlaydi (faqat shrift o‘zgaradi).
 
-Sayt Cloudflare Pages orqali joylashtirilgan: build buyrug‘i yo‘q, chiqish papkasi – repozitoriya ildizi (`/`).
+Sayt Vercel’da joylashtirilgan: https://fast-demo-pi.vercel.app/ (Framework Preset – `Other`, build buyrug‘i yo‘q).
 
 ## Manbalar
 
