@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAST burchak detektori</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* Projektorda o'qiladigan yorug' laboratoriya paneli: chapda katta tasvir, o'ngda boshqaruv va lupa */
+  --bg: #eef1f5;
+  --panel: #ffffff;
+  --ink: #142033;
+  --muted: #5b6678;
+  --line: #d6dce5;
+  --accent: #1d4ed8;
+  --kp: #16c25a;
+  --bright: #e4572e;
+  --dark: #2f7fd8;
+  --font-display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; padding: 18px 24px 10px; }
+h1 { font-family: var(--font-display); font-size: 24px; margin: 0; text-wrap: balance; }
+h1 span { color: var(--accent); }
+.who { color: var(--muted); font-size: 14px; }
+main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; padding: 8px 24px 24px; }
+@media (max-width: 960px) { main { grid-template-columns: 1fr; } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.stage { display: flex; flex-direction: column; gap: 12px; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { font: inherit; font-weight: 600; background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 9px 16px; cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+.btn:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #93b4ff; outline-offset: 2px; }
+.hint { color: var(--muted); font-size: 13px; }
+.canvasWrap { position: relative; border: 2px dashed transparent; border-radius: 8px; overflow: auto; background: #0f1724; display: flex; justify-content: center; }
+.canvasWrap.drag { border-color: var(--accent); }
+#view { display: block; max-width: 100%; height: auto; cursor: crosshair; image-rendering: auto; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 600px) { .stats { grid-template-columns: repeat(2, 1fr); } }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+.stat b { display: block; font-family: var(--font-mono); font-size: 26px; font-variant-numeric: tabular-nums; }
+.stat b.kp { color: #0f9a45; }
+.stat small { color: var(--muted); font-size: 13px; }
+aside { display: flex; flex-direction: column; gap: 16px; }
+h2 { font-size: 15px; margin: 0 0 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.ctl { display: grid; gap: 4px; margin-bottom: 14px; }
+.ctl label { display: flex; justify-content: space-between; font-weight: 500; }
+.ctl label output { font-family: var(--font-mono); color: var(--accent); font-weight: 600; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+select { font: inherit; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); }
+.row { display: flex; gap: 18px; flex-wrap: wrap; }
+.check { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.lupa { display: grid; grid-template-columns: 180px 1fr; gap: 14px; align-items: start; }
+@media (max-width: 400px) { .lupa { grid-template-columns: 1fr; } }
+#zoom { width: 180px; height: 180px; border-radius: 6px; border: 1px solid var(--line); }
+.verdict { display: inline-block; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 8px; }
+.verdict.yes { background: #dcf7e6; color: #0b6b32; }
+.verdict.no { background: #eceff3; color: #4a5568; }
+.legend { display: grid; gap: 4px; font-size: 13px; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+.mono { font-family: var(--font-mono); font-size: 13px; }
+.formula { font-family: var(--font-mono); font-size: 13px; background: #f3f5f9; border-radius: 6px; padding: 8px 10px; margin-top: 8px; line-height: 1.5; }
+input[type=file] { display: none; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <h1><span>FAST</span> burchak detektori: jonli namoyish</h1>
+  <div class="who">Sobirov Farrux · 261-23 SIo‘ · Kompyuter ko‘rishi, 1-mustaqil ish</div>
+</header>
+
+<main>
+  <section class="stage">
+    <div class="toolbar">
+      <button class="btn" id="pick" type="button">Rasm yuklash</button>
+      <button class="btn ghost" id="demo" type="button">Namuna tasvir</button>
+      <input type="file" id="file" accept="image/*">
+      <span class="hint" id="src">Namuna tasvir. Rasmni shu yerga tashlashingiz ham mumkin. Pikselga bosing: lupada uning aylanasi chiqadi.</span>
+    </div>
+    <div class="canvasWrap" id="wrap"><canvas id="view" width="720" height="480"></canvas></div>
+    <div class="stats">
+      <div class="stat"><b class="kp" id="sCount">0</b><small>topilgan nuqtalar</small></div>
+      <div class="stat"><b id="sTime">0</b><small>vaqt, ms</small></div>
+      <div class="stat"><b id="sPass">–</b><small>tezkor testdan o‘tgan piksellar (N = 12 da)</small></div>
+      <div class="stat"><b id="sSize" style="font-size:20px">0×0</b><small>tasvir o‘lchami, piksel</small></div>
+    </div>
+  </section>
+
+  <aside>
+    <div class="card">
+      <h2>Parametrlar</h2>
+      <div class="ctl">
+        <label for="t">Chegara t (threshold) <output id="tOut">25</output></label>
+        <input type="range" id="t" min="5" max="100" step="1" value="25">
+      </div>
+      <div class="ctl">
+        <label for="n">Ketma-ket piksellar soni N</label>
+        <select id="n">
+          <option value="9" selected>N = 9 (FAST-9, OpenCV standarti)</option>
+          <option value="10">N = 10</option>
+          <option value="11">N = 11</option>
+          <option value="12">N = 12 (tezkor test bilan)</option>
+        </select>
+      </div>
+      <div class="ctl">
+        <label for="noise">Gauss shovqini σ <output id="noiseOut">0</output></label>
+        <input type="range" id="noise" min="0" max="30" step="1" value="0">
+      </div>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="nms" checked> NMS</label>
+        <label class="check"><input type="checkbox" id="blur"> Gauss filtri</label>
+        <label class="check"><input type="checkbox" id="show" checked> Nuqtalarni ko‘rsatish</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Lupa: tanlangan piksel</h2>
+      <div class="lupa">
+        <canvas id="zoom" width="180" height="180"></canvas>
+        <div>
+          <div class="verdict no" id="verdict">–</div>
+          <div class="mono" id="pinfo"></div>
+          <div class="legend" style="margin-top:8px">
+            <span><i style="background:var(--bright)"></i>yorqinroq (&gt; I<sub>p</sub>+t)</span>
+            <span><i style="background:var(--dark)"></i>qorong‘iroq (&lt; I<sub>p</sub>−t)</span>
+            <span><i style="background:#c7ced8"></i>o‘xshash</span>
+          </div>
+        </div>
+      </div>
+      <div class="formula" id="formula"></div>
+    </div>
+  </aside>
+</main>
+
+<script>
+(() => {
+  // 16 pikselli Bresenham aylanasi (radius 3), 1-piksel tepada, soat strelkasi bo'yicha
+  const CIRCLE = [[0,-3],[1,-3],[2,-2],[3,-1],[3,0],[3,1],[2,2],[1,3],[0,3],[-1,3],[-2,2],[-3,1],[-3,0],[-3,-1],[-2,-2],[-1,-3]];
+  const MAX_SIDE = 900;
+  const $ = id => document.getElementById(id);
+  const view = $('view'), vctx = view.getContext('2d');
+  const zoom = $('zoom'), zctx = zoom.getContext('2d');
+
+  let W = 0, H = 0, base = null, gray = null, kps = [], sel = null, lastIsCorner = null;
+
+  // ---------- tasvir manbalari ----------
+  function demoImage() {
+    const c = document.createElement('canvas'); c.width = 720; c.height = 480;
+    const g = c.getContext('2d');
+    const sky = g.createLinearGradient(0, 0, 0, 480); sky.addColorStop(0, '#9cc3e6'); sky.addColorStop(1, '#e8eef4');
+    g.fillStyle = sky; g.fillRect(0, 0, 720, 480);
+    g.fillStyle = '#f2c14e'; g.beginPath(); g.arc(610, 80, 42, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#6b7b56'; g.fillRect(0, 380, 720, 100);
+    // binolar
+    const blds = [[40, 170, 150, 210, '#7a8494'], [210, 110, 120, 270, '#4f5a6b'], [350, 200, 170, 180, '#8d6e5a']];
+    for (const [x, y, w, h, col] of blds) {
+      g.fillStyle = col; g.fillRect(x, y, w, h);
+      g.fillStyle = '#dfe8f1';
+      for (let wy = y + 18; wy < y + h - 30; wy += 36) for (let wx = x + 16; wx < x + w - 20; wx += 32) g.fillRect(wx, wy, 16, 20);
+    }
+    g.fillStyle = '#5e3b2e'; g.beginPath(); g.moveTo(340, 200); g.lineTo(435, 130); g.lineTo(530, 200); g.closePath(); g.fill();
+    // shaxmat taxtasi
+    for (let i = 0; i < 6; i++) for (let j = 0; j < 6; j++) { g.fillStyle = (i + j) % 2 ? '#111' : '#f5f5f5'; g.fillRect(560 + i * 22, 250 + j * 22, 22, 22); }
+    g.fillStyle = '#1b2a41'; g.font = 'bold 54px sans-serif'; g.fillText('FAST', 60, 455);
+    return c;
+  }
+
+  function loadCanvas(src, label) {
+    let w = src.width, h = src.height;
+    const k = Math.min(1, MAX_SIDE / Math.max(w, h));
+    W = Math.max(8, Math.round(w * k)); H = Math.max(8, Math.round(h * k));
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d'); g.drawImage(src, 0, 0, W, H);
+    const d = g.getImageData(0, 0, W, H).data;
+    base = new Float32Array(W * H);
+    for (let i = 0, j = 0; i < base.length; i++, j += 4) base[i] = 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2];
+    view.width = W; view.height = H;
+    $('src').textContent = label;
+    sel = null;
+    run();
+  }
+
+  function loadFile(f) {
+    if (!f || !f.type.startsWith('image/')) { $('src').textContent = 'Bu fayl rasm emas. JPG yoki PNG fayl tanlang.'; return; }
+    const url = URL.createObjectURL(f);
+    const img = new Image();
+    img.onload = () => { loadCanvas(img, `${f.name}, ${img.naturalWidth}×${img.naturalHeight}` + (Math.max(img.naturalWidth, img.naturalHeight) > MAX_SIDE ? `, tezlik uchun ${MAX_SIDE} pikselgacha kichraytirildi` : '')); URL.revokeObjectURL(url); };
+    img.onerror = () => { $('src').textContent = 'Rasmni ochib bo‘lmadi. Boshqa faylni sinab ko‘ring.'; };
+    img.src = url;
+  }
+
+  // ---------- oldindan ishlov: shovqin va Gauss filtri ----------
+  function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function prepare() {
+    const sigma = +$('noise').value;
+    const out = new Float32Array(base);
+    if (sigma > 0) {
+      const r = rng(12345);
+      for (let i = 0; i < out.length; i += 2) {
+        const u = Math.max(r(), 1e-9), v = r(), m = Math.sqrt(-2 * Math.log(u));
+        out[i] += sigma * m * Math.cos(2 * Math.PI * v);
+        if (i + 1 < out.length) out[i + 1] += sigma * m * Math.sin(2 * Math.PI * v);
+      }
+    }
+    let res = out;
+    if ($('blur').checked) {
+      const s = 1.2, k = [-2, -1, 0, 1, 2].map(x => Math.exp(-x * x / (2 * s * s))), ks = k.reduce((a, b) => a + b);
+      const tmp = new Float32Array(out.length); res = new Float32Array(out.length);
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { let a = 0; for (let j = -2; j <= 2; j++) a += k[j + 2] * out[y * W + Math.min(W - 1, Math.max(0, x + j))]; tmp[y * W + x] = a / ks; }
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { let a = 0; for (let j = -2; j <= 2; j++) a += k[j + 2] * tmp[Math.min(H - 1, Math.max(0, y + j)) * W + x]; res[y * W + x] = a / ks; }
+    }
+    const g8 = new Uint8ClampedArray(res.length);
+    for (let i = 0; i < res.length; i++) g8[i] = res[i];
+    return g8;
+  }
+
+  // ---------- FAST ----------
+  const OFF = () => CIRCLE.map(([dx, dy]) => dy * W + dx);
+  function hasRun(mask, N) {          // aylanada ketma-ket N ta bit bormi (aylana yopiq)
+    let m = mask | (mask << 16), r = m;
+    for (let j = 1; j < N; j++) r &= m >>> j;
+    return (r & 0xFFFF) !== 0;
+  }
+  function fast(I, t, N, nms) {
+    const off = OFF(), score = new Float32Array(W * H);
+    let tested = 0, passed = 0;
+    const useHS = N >= 12;
+    for (let y = 3; y < H - 3; y++) {
+      for (let x = 3; x < W - 3; x++) {
+        const i = y * W + x, p = I[i], hi = p + t, lo = p - t;
+        tested++;
+        if (useHS) {               // tezkor test: 1, 5, 9, 13-piksellar
+          let b = 0, d = 0;
+          for (const k of [0, 4, 8, 12]) { const v = I[i + off[k]]; if (v > hi) b++; else if (v < lo) d++; }
+          if (b < 3 && d < 3) continue;
+        }
+        passed++;
+        let bm = 0, dm = 0, sb = 0, sd = 0;
+        for (let k = 0; k < 16; k++) {
+          const v = I[i + off[k]];
+          if (v > hi) { bm |= 1 << k; sb += v - p - t; }
+          else if (v < lo) { dm |= 1 << k; sd += p - v - t; }
+        }
+        if (hasRun(bm, N) || hasRun(dm, N)) score[i] = Math.max(sb, sd);
+      }
+    }
+    const pts = [];
+    for (let y = 3; y < H - 3; y++) for (let x = 3; x < W - 3; x++) {
+      const i = y * W + x, s = score[i];
+      if (!s) continue;
+      if (nms) {
+        let keep = true;
+        for (let dy = -1; dy <= 1 && keep; dy++) for (let dx = -1; dx <= 1; dx++) {
+          if (!dx && !dy) continue;
+          const q = score[i + dy * W + dx];
+          if (q > s || (q === s && (dy < 0 || (dy === 0 && dx < 0)))) { keep = false; break; }
+        }
+        if (!keep) continue;
+      }
+      pts.push([x, y, s]);
+    }
+    return { pts, pass: useHS ? passed / tested : null };
+  }
+
+  // ---------- chizish ----------
+  function draw() {
+    const img = vctx.createImageData(W, H);
+    for (let i = 0, j = 0; i < gray.length; i++, j += 4) { img.data[j] = img.data[j + 1] = img.data[j + 2] = gray[i]; img.data[j + 3] = 255; }
+    vctx.putImageData(img, 0, 0);
+    const lw = Math.max(1.2, W / 600);
+    if ($('show').checked) {
+      vctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--kp').trim();
+      vctx.lineWidth = lw;
+      for (const [x, y] of kps) { vctx.beginPath(); vctx.arc(x + .5, y + .5, 3.5 * lw, 0, Math.PI * 2); vctx.stroke(); }
+    }
+    if (sel) {
+      vctx.strokeStyle = '#ffd400'; vctx.lineWidth = lw * 1.6;
+      vctx.strokeRect(sel[0] - 5, sel[1] - 5, 11, 11);
+    }
+  }
+
+  function circularMaxRun(mask) {
+    if (mask === 0xFFFF) return 16;
+    let best = 0, cur = 0;
+    for (let k = 0; k < 32; k++) { if (mask >> (k % 16) & 1) { cur++; best = Math.max(best, cur); } else cur = 0; }
+    return Math.min(best, 16);
+  }
+
+  function drawZoom() {
+    const cell = 20; zctx.clearRect(0, 0, 180, 180);
+    if (!sel) { $('verdict').textContent = '–'; $('pinfo').textContent = 'Tasvirdagi biror pikselga bosing.'; $('formula').textContent = ''; return; }
+    const [cx, cy] = sel, t = +$('t').value, N = +$('n').value;
+    const p = gray[cy * W + cx], hi = p + t, lo = p - t;
+    const css = getComputedStyle(document.documentElement);
+    const colB = css.getPropertyValue('--bright').trim(), colD = css.getPropertyValue('--dark').trim();
+    for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
+      const x = Math.min(W - 1, Math.max(0, cx + dx)), y = Math.min(H - 1, Math.max(0, cy + dy)), v = gray[y * W + x];
+      zctx.fillStyle = `rgb(${v},${v},${v})`; zctx.fillRect((dx + 4) * cell, (dy + 4) * cell, cell, cell);
+    }
+    let bm = 0, dm = 0;
+    zctx.font = 'bold 10px IBM Plex Mono, monospace'; zctx.textAlign = 'center'; zctx.textBaseline = 'middle';
+    CIRCLE.forEach(([dx, dy], k) => {
+      const v = gray[(cy + dy) * W + cx + dx];
+      let col = '#c7ced8';
+      if (v > hi) { bm |= 1 << k; col = colB; } else if (v < lo) { dm |= 1 << k; col = colD; }
+      const X = (dx + 4) * cell, Y = (dy + 4) * cell;
+      zctx.lineWidth = 3; zctx.strokeStyle = col; zctx.strokeRect(X + 1.5, Y + 1.5, cell - 3, cell - 3);
+      zctx.fillStyle = v > 140 ? '#000' : '#fff'; zctx.fillText(String(k + 1), X + cell / 2, Y + cell / 2 + 1);
+    });
+    zctx.lineWidth = 3; zctx.strokeStyle = '#ffd400'; zctx.strokeRect(4 * cell + 1.5, 4 * cell + 1.5, cell - 3, cell - 3);
+    zctx.fillStyle = p > 140 ? '#000' : '#fff'; zctx.fillText('p', 4 * cell + cell / 2, 4 * cell + cell / 2 + 1);
+
+    const rb = circularMaxRun(bm), rd = circularMaxRun(dm);
+    const isCorner = rb >= N || rd >= N;
+    const v = $('verdict'); v.textContent = isCorner ? 'Burchak' : 'Burchak emas'; v.className = 'verdict ' + (isCorner ? 'yes' : 'no');
+    $('pinfo').innerHTML = `(${cx}, ${cy})<br>I<sub>p</sub> = ${p}, t = ${t}<br>ketma-ket yorqin: ${rb}<br>ketma-ket qorong‘i: ${rd}`;
+    $('formula').innerHTML = `yorqinroq: I &gt; ${p}+${t} = ${p + t}<br>qorong‘iroq: I &lt; ${p}−${t} = ${p - t}<br>shart: ketma-ket ≥ ${N} ta → ${isCorner ? 'bajarildi' : 'bajarilmadi'}` + (isCorner && $('nms').checked && !kps.some(k => k[0] === cx && k[1] === cy) ? '<br>(NMS: qo‘shni nuqta kuchliroq, shuning uchun bu nuqta tashlandi)' : '');
+  }
+
+  function run() {
+    gray = prepare();
+    const t = +$('t').value, N = +$('n').value, nms = $('nms').checked;
+    const t0 = performance.now();
+    const r = fast(gray, t, N, nms);
+    const ms = performance.now() - t0;
+    kps = r.pts;
+    if (!sel && kps.length) { const best = kps.reduce((a, b) => (b[2] > a[2] ? b : a)); sel = [best[0], best[1]]; }
+    $('sCount').textContent = kps.length.toLocaleString('uz');
+    $('sTime').textContent = ms.toFixed(1);
+    $('sPass').textContent = r.pass == null ? '–' : (r.pass * 100).toFixed(1) + '%';
+    $('sSize').textContent = `${W}×${H}`;
+    draw(); drawZoom();
+  }
+
+  // ---------- hodisalar ----------
+  $('pick').addEventListener('click', () => $('file').click());
+  $('file').addEventListener('change', e => loadFile(e.target.files[0]));
+  $('demo').addEventListener('click', () => loadCanvas(demoImage(), 'Namuna tasvir. Rasmni shu yerga tashlashingiz ham mumkin. Pikselga bosing: lupada uning aylanasi chiqadi.'));
+  const wrap = $('wrap');
+  ['dragenter', 'dragover'].forEach(ev => wrap.addEventListener(ev, e => { e.preventDefault(); wrap.classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach(ev => wrap.addEventListener(ev, e => { e.preventDefault(); wrap.classList.remove('drag'); }));
+  wrap.addEventListener('drop', e => loadFile(e.dataTransfer.files[0]));
+  view.addEventListener('click', e => {
+    const r = view.getBoundingClientRect();
+    const x = Math.floor((e.clientX - r.left) * W / r.width), y = Math.floor((e.clientY - r.top) * H / r.height);
+    sel = [Math.min(W - 4, Math.max(3, x)), Math.min(H - 4, Math.max(3, y))];
+    draw(); drawZoom();
+  });
+  $('t').addEventListener('input', () => { $('tOut').textContent = $('t').value; run(); });
+  $('noise').addEventListener('input', () => { $('noiseOut').textContent = $('noise').value; run(); });
+  ['n', 'nms', 'blur'].forEach(id => $(id).addEventListener('change', run));
+  $('show').addEventListener('change', draw);
+
+  loadCanvas(demoImage(), 'Namuna tasvir. Rasmni shu yerga tashlashingiz ham mumkin. Pikselga bosing: lupada uning aylanasi chiqadi.');
+})();
+</script>
+</body>
+</html>
