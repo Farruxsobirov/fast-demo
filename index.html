@@ -4,214 +4,388 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FAST burchak detektori</title>
+<meta name="description" content="FAST algoritmi yordamida tasvirdagi burchaklarni brauzerda jonli aniqlash. Sobirov Farrux, TATU, Kompyuter ko‘rishi.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 7'%3E%3Cg fill='%23ef5a2a'%3E%3Crect x='2' y='0' width='3' height='1'/%3E%3Crect x='5' y='1' width='1' height='1'/%3E%3Crect x='6' y='2' width='1' height='3'/%3E%3Crect x='1' y='1' width='1' height='1'/%3E%3C/g%3E%3Cg fill='%232a6fdb'%3E%3Crect x='5' y='5' width='1' height='1'/%3E%3Crect x='2' y='6' width='3' height='1'/%3E%3Crect x='1' y='5' width='1' height='1'/%3E%3Crect x='0' y='2' width='1' height='3'/%3E%3C/g%3E%3Crect x='3' y='3' width='1' height='1' fill='%230e1a2b'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  /* Projektorda o'qiladigan yorug' laboratoriya paneli: chapda katta tasvir, o'ngda boshqaruv va lupa */
-  --bg: #eef1f5;
-  --panel: #ffffff;
-  --ink: #142033;
-  --muted: #5b6678;
-  --line: #d6dce5;
-  --accent: #1d4ed8;
-  --kp: #16c25a;
-  --bright: #e4572e;
-  --dark: #2f7fd8;
-  --font-display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
-  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+  /* Yo'nalish: chizma qog'ozi ustidagi o'lchov asbobi. Brend belgisi - FAST'ning 16 pikselli aylanasi.
+     Iliq (yorqinroq) va sovuq (qorong'iroq) signal ranglari aylana sinflaridan olingan; tasvir sahnasi qorong'i, nuqtalar yashil. */
+  --paper: #f3f5f8;
+  --grid: rgba(14, 26, 43, .055);
+  --card: #ffffff;
+  --ink: #0e1a2b;
+  --muted: #5d687a;
+  --line: #dde2ea;
+  --stage: #0b1220;
+  --accent: #2a6fdb;
+  --warm: #ef5a2a;
+  --cool: #2a6fdb;
+  --kp: #19c46b;
+  --same: #c9d0da;
+  --font-display: "Unbounded", "Arial Black", system-ui, sans-serif;
+  --font-body: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Consolas", ui-monospace, monospace;
+  --r: 14px;
   color-scheme: light;
 }
 * { box-sizing: border-box; }
-html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; }
-header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; padding: 18px 24px 10px; }
-h1 { font-family: var(--font-display); font-size: 24px; margin: 0; text-wrap: balance; }
-h1 span { color: var(--accent); }
-.who { color: var(--muted); font-size: 14px; }
-main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; padding: 8px 24px 24px; }
-@media (max-width: 960px) { main { grid-template-columns: 1fr; } }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
-.stage { display: flex; flex-direction: column; gap: 12px; }
-.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-.btn { font: inherit; font-weight: 600; background: var(--accent); color: #fff; border: 0; border-radius: 8px; padding: 9px 16px; cursor: pointer; }
-.btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-.btn:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #93b4ff; outline-offset: 2px; }
-.hint { color: var(--muted); font-size: 13px; }
-.canvasWrap { position: relative; border: 2px dashed transparent; border-radius: 8px; overflow: auto; background: #0f1724; display: flex; justify-content: center; }
-.canvasWrap.drag { border-color: var(--accent); }
-#view { display: block; max-width: 100%; height: auto; cursor: crosshair; image-rendering: auto; }
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-@media (max-width: 600px) { .stats { grid-template-columns: repeat(2, 1fr); } }
-.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
-.stat b { display: block; font-family: var(--font-mono); font-size: 26px; font-variant-numeric: tabular-nums; }
-.stat b.kp { color: #0f9a45; }
-.stat small { color: var(--muted); font-size: 13px; }
-aside { display: flex; flex-direction: column; gap: 16px; }
-h2 { font-size: 15px; margin: 0 0 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
-.ctl { display: grid; gap: 4px; margin-bottom: 14px; }
-.ctl label { display: flex; justify-content: space-between; font-weight: 500; }
-.ctl label output { font-family: var(--font-mono); color: var(--accent); font-weight: 600; }
-input[type=range] { width: 100%; accent-color: var(--accent); }
-select { font: inherit; padding: 6px 8px; border-radius: 6px; border: 1px solid var(--line); }
-.row { display: flex; gap: 18px; flex-wrap: wrap; }
-.check { display: flex; align-items: center; gap: 8px; font-weight: 500; }
-.check input { width: 18px; height: 18px; accent-color: var(--accent); }
-.lupa { display: grid; grid-template-columns: 180px 1fr; gap: 14px; align-items: start; }
-@media (max-width: 400px) { .lupa { grid-template-columns: 1fr; } }
-#zoom { width: 180px; height: 180px; border-radius: 6px; border: 1px solid var(--line); }
-.verdict { display: inline-block; font-weight: 700; padding: 3px 10px; border-radius: 999px; margin-bottom: 8px; }
-.verdict.yes { background: #dcf7e6; color: #0b6b32; }
-.verdict.no { background: #eceff3; color: #4a5568; }
-.legend { display: grid; gap: 4px; font-size: 13px; }
-.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
-.mono { font-family: var(--font-mono); font-size: 13px; }
-.formula { font-family: var(--font-mono); font-size: 13px; background: #f3f5f9; border-radius: 6px; padding: 8px 10px; margin-top: 8px; line-height: 1.5; }
+html, body { margin: 0; }
+body {
+  background-color: var(--paper);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+}
+a { color: var(--accent); }
+.wrap { max-width: 1440px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 500px) { .wrap { padding: 0 16px; } }
+
+/* ---------- sarlavha ---------- */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 0; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 14px; }
+.brand svg { width: 44px; height: 44px; flex: none; }
+.brand .name { font-family: var(--font-display); font-weight: 800; font-size: 22px; letter-spacing: .02em; line-height: 1; }
+.brand .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.links { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip-link { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; color: var(--ink); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 600; }
+.chip-link:hover { border-color: var(--ink); }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: end; padding: 14px 0 22px; border-bottom: 1px solid var(--line); margin-bottom: 22px; }
+@media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+.hero h1 { font-family: var(--font-display); font-weight: 700; font-size: clamp(26px, 3.4vw, 44px); line-height: 1.08; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+.hero h1 em { font-style: normal; color: var(--warm); }
+.hero h1 b { font-weight: 700; color: var(--cool); }
+.hero p { margin: 0; color: var(--muted); max-width: 62ch; font-size: 16px; }
+.steps { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.steps span { font-family: var(--font-mono); font-size: 12px; font-weight: 600; background: var(--ink); color: #fff; border-radius: 6px; padding: 4px 9px; }
+
+/* ---------- asosiy ish maydoni ---------- */
+.work { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 20px; align-items: start; }
+@media (max-width: 1080px) { .work { grid-template-columns: 1fr; } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); }
+.pad { padding: 18px; }
+.label { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; }
+
+.viewer { overflow: hidden; }
+.vbar { display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+.vbar .left, .vbar .right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.btn { font: inherit; font-weight: 700; font-size: 14px; border-radius: 10px; padding: 9px 15px; cursor: pointer; border: 1px solid var(--ink); background: var(--ink); color: #fff; display: inline-flex; align-items: center; gap: 8px; }
+.btn:hover { background: #1d2e47; }
+.btn.ghost { background: var(--card); color: var(--ink); border-color: var(--line); }
+.btn.ghost:hover { border-color: var(--ink); }
+.btn svg { width: 16px; height: 16px; }
+.fname { font-size: 13px; color: var(--muted); max-width: 46ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stage { position: relative; background: var(--stage); display: flex; justify-content: center; align-items: center; min-height: 320px; }
+.stage.drag::after { content: "Rasmni shu yerga qo‘yib yuboring"; position: absolute; inset: 10px; border: 2px dashed #7aa2ff; border-radius: 10px; display: grid; place-items: center; color: #dbe6ff; font-weight: 700; background: rgba(11, 18, 32, .75); }
+#view { display: block; max-width: 100%; height: auto; cursor: crosshair; }
+.stage .tag { position: absolute; left: 12px; bottom: 12px; font-family: var(--font-mono); font-size: 12px; color: #c8d3e6; background: rgba(11, 18, 32, .72); border-radius: 6px; padding: 4px 8px; pointer-events: none; }
+
+.readouts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+@media (max-width: 640px) { .readouts { grid-template-columns: repeat(2, 1fr); } }
+.ro { padding: 14px 16px; border-right: 1px solid var(--line); }
+.ro:last-child { border-right: 0; }
+@media (max-width: 640px) { .ro:nth-child(2) { border-right: 0; } .ro:nth-child(-n+2) { border-bottom: 1px solid var(--line); } }
+.ro b { display: block; font-family: var(--font-mono); font-weight: 700; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ro b.kp { color: #0d9a52; }
+.ro small { color: var(--muted); font-size: 12.5px; }
+
+.chart { padding: 14px 16px 10px; border-top: 1px solid var(--line); }
+.chart .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.chart .head span { font-size: 12.5px; color: var(--muted); }
+#curve { width: 100%; height: 150px; display: block; }
+
+/* ---------- boshqaruv ---------- */
+.side { display: flex; flex-direction: column; gap: 20px; }
+.ctl { margin-bottom: 18px; }
+.ctl:last-child { margin-bottom: 0; }
+.ctl .row1 { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.ctl .row1 label, .ctl .row1 .t { font-weight: 700; }
+.ctl .row1 output { font-family: var(--font-mono); font-weight: 700; font-size: 18px; color: var(--accent); }
+.ctl .note { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 28px; background: transparent; }
+input[type=range]::-webkit-slider-runnable-track { height: 6px; border-radius: 6px; background: linear-gradient(90deg, var(--ink) var(--p, 20%), var(--line) var(--p, 20%)); }
+input[type=range]::-moz-range-track { height: 6px; border-radius: 6px; background: var(--line); }
+input[type=range]::-moz-range-progress { height: 6px; border-radius: 6px; background: var(--ink); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 3px solid var(--ink); margin-top: -7px; }
+input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 3px solid var(--ink); }
+.seg { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 3px; gap: 3px; }
+.seg button { font: inherit; font-family: var(--font-mono); font-weight: 700; border: 0; border-radius: 8px; padding: 7px 0; background: transparent; color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(14, 26, 43, .18); }
+.switches { display: grid; gap: 10px; }
+.sw { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 600; cursor: pointer; }
+.sw small { display: block; font-weight: 500; color: var(--muted); font-size: 12.5px; }
+.sw input { -webkit-appearance: none; appearance: none; width: 42px; height: 24px; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; flex: none; transition: background .15s; }
+.sw input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .15s; }
+.sw input:checked { background: var(--ink); }
+.sw input:checked::after { transform: translateX(18px); }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.presets button { font: inherit; font-size: 13px; font-weight: 600; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 6px 11px; cursor: pointer; }
+.presets button:hover { border-color: var(--ink); }
+.hr { height: 1px; background: var(--line); margin: 18px 0; }
+
+/* ---------- lupa ---------- */
+.loupe-top { display: grid; gap: 14px; }
+#zoom { width: 100%; max-width: 420px; aspect-ratio: 1; height: auto; border-radius: 10px; display: block; margin: 0 auto; }
+.loupe-info { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; align-items: start; }
+@media (max-width: 420px) { .loupe-info { grid-template-columns: 1fr; } }
+.verdict { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 14px; padding: 5px 11px; border-radius: 999px; margin-bottom: 10px; }
+.verdict.yes { background: #dcf8e8; color: #08713c; }
+.verdict.no { background: #edf0f4; color: #4a5568; }
+.kv { display: grid; grid-template-columns: auto auto; gap: 2px 12px; font-family: var(--font-mono); font-size: 13px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.ring { margin-top: 14px; }
+.ring .cells { display: grid; grid-template-columns: repeat(16, 1fr); gap: 2px; }
+.ring .cells div { aspect-ratio: 1; border-radius: 4px; display: grid; place-items: center; font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: #fff; background: var(--same); position: relative; }
+.ring .cells div.s { color: #4a5568; }
+.ring .cells div.run { outline: 2px solid var(--ink); outline-offset: 1px; }
+.ring .cap { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); margin-top: 8px; gap: 8px; flex-wrap: wrap; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+.legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; }
+.calc { font-family: var(--font-mono); font-size: 12.5px; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 12px; line-height: 1.65; }
+.calc .ok { color: #08713c; font-weight: 700; } .calc .bad { color: #a23b1b; font-weight: 700; }
+
+/* ---------- qanday ishlaydi ---------- */
+.how { margin: 36px 0 12px; }
+.how h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(22px, 2.4vw, 30px); margin: 0 0 18px; }
+.how .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 1000px) { .how .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .how .grid { grid-template-columns: 1fr; } }
+.how .step { padding: 18px; }
+.how .num { font-family: var(--font-display); font-weight: 800; font-size: 13px; color: var(--warm); letter-spacing: .08em; }
+.how h3 { font-size: 17px; margin: 6px 0 8px; }
+.how p { margin: 0; color: var(--muted); font-size: 14.5px; }
+.how code { font-family: var(--font-mono); font-size: 13px; background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; color: var(--ink); white-space: nowrap; }
+.foot { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; color: var(--muted); font-size: 13px; padding: 22px 0 30px; border-top: 1px solid var(--line); margin-top: 26px; }
 input[type=file] { display: none; }
+:focus-visible { outline: 3px solid #8fb0ff; outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
-<header>
-  <h1><span>FAST</span> burchak detektori: jonli namoyish</h1>
-  <div class="who">Sobirov Farrux · 261-23 SIo‘ · Kompyuter ko‘rishi, 1-mustaqil ish</div>
-</header>
-
-<main>
-  <section class="stage">
-    <div class="toolbar">
-      <button class="btn" id="pick" type="button">Rasm yuklash</button>
-      <button class="btn ghost" id="demo" type="button">Namuna tasvir</button>
-      <input type="file" id="file" accept="image/*">
-      <span class="hint" id="src">Namuna tasvir. Rasmni shu yerga tashlashingiz ham mumkin. Pikselga bosing: lupada uning aylanasi chiqadi.</span>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+        <g fill="#ef5a2a"><rect x="2" y="0" width="3" height="1"/><rect x="5" y="1" width="1" height="1"/><rect x="6" y="2" width="1" height="3"/><rect x="1" y="1" width="1" height="1"/></g>
+        <g fill="#2a6fdb"><rect x="5" y="5" width="1" height="1"/><rect x="2" y="6" width="3" height="1"/><rect x="1" y="5" width="1" height="1"/><rect x="0" y="2" width="1" height="3"/></g>
+        <rect x="3" y="3" width="1" height="1" fill="#0e1a2b"/>
+      </svg>
+      <div>
+        <div class="name">FAST</div>
+        <div class="sub">Features from Accelerated Segment Test</div>
+      </div>
     </div>
-    <div class="canvasWrap" id="wrap"><canvas id="view" width="720" height="480"></canvas></div>
-    <div class="stats">
-      <div class="stat"><b class="kp" id="sCount">0</b><small>topilgan nuqtalar</small></div>
-      <div class="stat"><b id="sTime">0</b><small>vaqt, ms</small></div>
-      <div class="stat"><b id="sPass">–</b><small>tezkor testdan o‘tgan piksellar (N = 12 da)</small></div>
-      <div class="stat"><b id="sSize" style="font-size:20px">0×0</b><small>tasvir o‘lchami, piksel</small></div>
+    <nav class="links">
+      <a class="chip-link" href="https://github.com/Farruxsobirov/fast-demo" target="_blank" rel="noopener">GitHub</a>
+      <a class="chip-link" href="https://colab.research.google.com/drive/1LuucPSRrVFpG1F036yz9bZEJEHspxJ-G?usp=sharing" target="_blank" rel="noopener">Google Colab</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Piksel atrofidagi 16 ta nuqtaga qarab, <em>burchakni</em> millisekundlarda <b>topamiz</b></h1>
+    <div>
+      <p>Rasm yuklang, chegarani o‘zgartiring va istalgan pikselga bosib, algoritm qaror qabul qilishini lupada kuzating. Barcha hisob-kitob brauzeringizda bajariladi.</p>
+      <div class="steps"><span>1 · 16 pikselli aylana</span><span>2 · segment test</span><span>3 · NMS</span></div>
     </div>
   </section>
 
-  <aside>
-    <div class="card">
-      <h2>Parametrlar</h2>
-      <div class="ctl">
-        <label for="t">Chegara t (threshold) <output id="tOut">25</output></label>
-        <input type="range" id="t" min="5" max="100" step="1" value="25">
+  <main class="work">
+    <section class="card viewer">
+      <div class="vbar">
+        <div class="left">
+          <button class="btn" id="pick" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>
+            Rasm yuklash</button>
+          <button class="btn ghost" id="demo" type="button">Namuna tasvir</button>
+          <input type="file" id="file" accept="image/*">
+        </div>
+        <div class="right"><span class="fname" id="src">Namuna tasvir</span></div>
       </div>
-      <div class="ctl">
-        <label for="n">Ketma-ket piksellar soni N</label>
-        <select id="n">
-          <option value="9" selected>N = 9 (FAST-9, OpenCV standarti)</option>
-          <option value="10">N = 10</option>
-          <option value="11">N = 11</option>
-          <option value="12">N = 12 (tezkor test bilan)</option>
-        </select>
+      <div class="stage" id="stage">
+        <canvas id="view" width="720" height="480" aria-label="Tasvir va topilgan burchaklar"></canvas>
+        <div class="tag" id="tag">pikselga bosing</div>
       </div>
-      <div class="ctl">
-        <label for="noise">Gauss shovqini σ <output id="noiseOut">0</output></label>
-        <input type="range" id="noise" min="0" max="30" step="1" value="0">
+      <div class="readouts">
+        <div class="ro"><b class="kp" id="sCount">0</b><small>topilgan burchaklar</small></div>
+        <div class="ro"><b id="sTime">0</b><small>hisoblash vaqti, ms</small></div>
+        <div class="ro"><b id="sPass">–</b><small>tezkor testdan o‘tdi (N = 12)</small></div>
+        <div class="ro"><b id="sSize">0×0</b><small>tasvir o‘lchami, piksel</small></div>
       </div>
-      <div class="row">
-        <label class="check"><input type="checkbox" id="nms" checked> NMS</label>
-        <label class="check"><input type="checkbox" id="blur"> Gauss filtri</label>
-        <label class="check"><input type="checkbox" id="show" checked> Nuqtalarni ko‘rsatish</label>
+      <div class="chart">
+        <div class="head"><p class="label" style="margin:0">Chegara t va burchaklar soni</p><span id="curveNote">hisoblanmoqda…</span></div>
+        <svg id="curve" viewBox="0 0 800 150" role="img" aria-label="Threshold qiymatiga qarab burchaklar soni grafigi"></svg>
       </div>
-    </div>
+    </section>
 
-    <div class="card">
-      <h2>Lupa: tanlangan piksel</h2>
-      <div class="lupa">
-        <canvas id="zoom" width="180" height="180"></canvas>
-        <div>
-          <div class="verdict no" id="verdict">–</div>
-          <div class="mono" id="pinfo"></div>
-          <div class="legend" style="margin-top:8px">
-            <span><i style="background:var(--bright)"></i>yorqinroq (&gt; I<sub>p</sub>+t)</span>
-            <span><i style="background:var(--dark)"></i>qorong‘iroq (&lt; I<sub>p</sub>−t)</span>
-            <span><i style="background:#c7ced8"></i>o‘xshash</span>
+    <aside class="side">
+      <section class="card pad">
+        <p class="label">Parametrlar</p>
+        <div class="ctl">
+          <div class="row1"><label for="t">Chegara t</label><output id="tOut">25</output></div>
+          <input type="range" id="t" min="5" max="100" step="1" value="25">
+          <div class="note">Aylana pikseli markazdan kamida t ga farq qilsa, “yorqinroq” yoki “qorong‘iroq” hisoblanadi.</div>
+        </div>
+        <div class="ctl">
+          <div class="row1"><span class="t" id="nLabel">Ketma-ket piksellar N</span><output id="nOut">9</output></div>
+          <div class="seg" role="group" aria-labelledby="nLabel">
+            <button type="button" data-n="9" aria-pressed="true">9</button>
+            <button type="button" data-n="10" aria-pressed="false">10</button>
+            <button type="button" data-n="11" aria-pressed="false">11</button>
+            <button type="button" data-n="12" aria-pressed="false">12</button>
+          </div>
+          <div class="note">N = 9 OpenCV standarti. N = 12 da tezkor test (1, 5, 9, 13-piksellar) ishlaydi.</div>
+        </div>
+        <div class="ctl">
+          <div class="row1"><label for="noise">Gauss shovqini σ</label><output id="noiseOut">0</output></div>
+          <input type="range" id="noise" min="0" max="30" step="1" value="0">
+        </div>
+        <div class="switches">
+          <label class="sw"><span>Non-Maximum Suppression<small>yopishgan nuqtalardan eng kuchlisini qoldiradi</small></span><input type="checkbox" id="nms" checked></label>
+          <label class="sw"><span>Gauss filtri (5×5)<small>shovqinni oldindan silliqlaydi</small></span><input type="checkbox" id="blur"></label>
+          <label class="sw"><span>Burchaklarni ko‘rsatish</span><input type="checkbox" id="show" checked></label>
+        </div>
+        <div class="hr"></div>
+        <p class="label" style="margin-bottom:10px">Tayyor ssenariylar</p>
+        <div class="presets">
+          <button type="button" data-p="std">Standart</button>
+          <button type="button" data-p="strong">Faqat kuchli burchaklar</button>
+          <button type="button" data-p="nonms">NMS’siz</button>
+          <button type="button" data-p="noise">Shovqin</button>
+          <button type="button" data-p="fix">Shovqin + filtr</button>
+        </div>
+      </section>
+
+      <section class="card pad">
+        <p class="label">Lupa: tanlangan piksel</p>
+        <div class="loupe-top">
+          <canvas id="zoom" width="560" height="560" aria-label="Tanlangan piksel atrofi, 7×7"></canvas>
+          <div class="loupe-info">
+            <div class="verdict no" id="verdict">–</div>
+            <dl class="kv" id="kv"></dl>
           </div>
         </div>
-      </div>
-      <div class="formula" id="formula"></div>
+        <div class="ring">
+          <div class="cells" id="cells"></div>
+          <div class="cap"><span>aylana piksellari 1 → 16 (16-dan keyin yana 1 keladi)</span><span id="runCap"></span></div>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--warm)"></i>yorqinroq</span>
+          <span><i style="background:var(--cool)"></i>qorong‘iroq</span>
+          <span><i style="background:var(--same)"></i>o‘xshash</span>
+        </div>
+        <div class="calc" id="calc"></div>
+      </section>
+    </aside>
+  </main>
+
+  <section class="how">
+    <h2>Algoritm qanday ishlaydi</h2>
+    <div class="grid">
+      <div class="card step"><div class="num">01</div><h3>16 pikselli aylana</h3><p>Har bir p piksel atrofida radiusi 3 bo‘lgan Bresenham aylanasi olinadi. Unda aynan 16 ta piksel bor, ular tepadan soat strelkasi bo‘yicha raqamlanadi.</p></div>
+      <div class="card step"><div class="num">02</div><h3>Uch sinf</h3><p>Har bir aylana pikseli markaz bilan solishtiriladi: <code>I &gt; I<sub>p</sub>+t</code> yorqinroq, <code>I &lt; I<sub>p</sub>−t</code> qorong‘iroq, qolgani o‘xshash. Hosila ham, matritsa ham hisoblanmaydi.</p></div>
+      <div class="card step"><div class="num">03</div><h3>Segment test</h3><p>Aylanada ketma-ket kamida N ta piksel bir xil sinfda bo‘lsa, p burchak hisoblanadi. Tekis sohada bunday ketma-ketlik yo‘q, to‘g‘ri chiziq ustida esa aylananing faqat yarmi farq qiladi.</p></div>
+      <div class="card step"><div class="num">04</div><h3>Javob va NMS</h3><p>Har bir burchakka <code>V = max(Σ(I−I<sub>p</sub>−t), Σ(I<sub>p</sub>−I−t))</code> javobi beriladi. 3×3 oynada eng katta javobli nuqta qoladi, qo‘shnilari o‘chiriladi.</p></div>
     </div>
-  </aside>
-</main>
+  </section>
+
+  <footer class="foot">
+    <span>Sobirov Farrux · 261-23 SIo‘ · Muhammad al-Xorazmiy nomidagi TATU · «Kompyuter ko‘rishi», 1-mustaqil ish</span>
+    <span>Manba: E. Rosten, T. Drummond, “Machine Learning for High-Speed Corner Detection”, ECCV 2006</span>
+  </footer>
+</div>
 
 <script>
 (() => {
-  // 16 pikselli Bresenham aylanasi (radius 3), 1-piksel tepada, soat strelkasi bo'yicha
+  // 16 pikselli Bresenham aylanasi (radius 3): 1-piksel tepada, soat strelkasi bo'yicha
   const CIRCLE = [[0,-3],[1,-3],[2,-2],[3,-1],[3,0],[3,1],[2,2],[1,3],[0,3],[-1,3],[-2,2],[-3,1],[-3,0],[-3,-1],[-2,-2],[-1,-3]];
   const MAX_SIDE = 900;
   const $ = id => document.getElementById(id);
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const view = $('view'), vctx = view.getContext('2d');
   const zoom = $('zoom'), zctx = zoom.getContext('2d');
+  const S = { t: 25, N: 9, noise: 0, nms: true, blur: false, show: true };
+  let W = 0, H = 0, base = null, gray = null, kps = [], sel = null, curveJob = 0;
 
-  let W = 0, H = 0, base = null, gray = null, kps = [], sel = null, lastIsCorner = null;
-
-  // ---------- tasvir manbalari ----------
+  // ---------- namuna tasvir ----------
   function demoImage() {
-    const c = document.createElement('canvas'); c.width = 720; c.height = 480;
+    const c = document.createElement('canvas'); c.width = 760; c.height = 480;
     const g = c.getContext('2d');
-    const sky = g.createLinearGradient(0, 0, 0, 480); sky.addColorStop(0, '#9cc3e6'); sky.addColorStop(1, '#e8eef4');
-    g.fillStyle = sky; g.fillRect(0, 0, 720, 480);
-    g.fillStyle = '#f2c14e'; g.beginPath(); g.arc(610, 80, 42, 0, Math.PI * 2); g.fill();
-    g.fillStyle = '#6b7b56'; g.fillRect(0, 380, 720, 100);
-    // binolar
-    const blds = [[40, 170, 150, 210, '#7a8494'], [210, 110, 120, 270, '#4f5a6b'], [350, 200, 170, 180, '#8d6e5a']];
+    const sky = g.createLinearGradient(0, 0, 0, 380); sky.addColorStop(0, '#8fb6dc'); sky.addColorStop(1, '#e6edf4');
+    g.fillStyle = sky; g.fillRect(0, 0, 760, 480);
+    g.fillStyle = '#f2c14e'; g.beginPath(); g.arc(660, 78, 40, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#5f7050'; g.fillRect(0, 384, 760, 96);
+    const rr = rng(7);
+    for (let i = 0; i < 380; i++) {           // o't-o'lan teksturasi: kontrasti har xil dog'lar
+      const v = 82 + rr() * 50; g.fillStyle = `rgb(${v * .8 | 0},${v | 0},${v * .7 | 0})`;
+      g.fillRect(rr() * 760, 386 + rr() * 94, 2 + rr() * 5, 1 + rr() * 3);
+    }
+    for (const [tx, ty, tr] of [[540, 330, 44], [612, 344, 34], [705, 322, 50]]) {   // daraxtlar
+      g.fillStyle = '#4a3a2c'; g.fillRect(tx - 5, ty + tr * .6, 10, 384 - ty - tr * .6);
+      for (let i = 0; i < 140; i++) {
+        const a = rr() * Math.PI * 2, d = Math.sqrt(rr()) * tr, v = 60 + rr() * 90;
+        g.fillStyle = `rgb(${v * .55 | 0},${v | 0},${v * .5 | 0})`;
+        g.beginPath(); g.arc(tx + Math.cos(a) * d, ty + Math.sin(a) * d * .9, 3 + rr() * 6, 0, Math.PI * 2); g.fill();
+      }
+    }
+    const sh = g.createLinearGradient(34, 0, 190, 0); sh.addColorStop(0, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(0,0,0,.18)');
+    g.fillStyle = sh; g.fillRect(34, 176, 156, 208);
+    g.fillStyle = '#f4f6f9'; g.fillRect(40, 404, 196, 66);
+    g.fillStyle = '#16233a'; g.font = '900 58px Arial, sans-serif'; g.fillText('FAST', 46, 458);
+    const blds = [[34, 176, 156, 208, '#7a8494'], [206, 108, 124, 276, '#4b5667'], [348, 206, 176, 178, '#8a6b57']];
     for (const [x, y, w, h, col] of blds) {
       g.fillStyle = col; g.fillRect(x, y, w, h);
-      g.fillStyle = '#dfe8f1';
+      g.fillStyle = '#e1e9f2';
       for (let wy = y + 18; wy < y + h - 30; wy += 36) for (let wx = x + 16; wx < x + w - 20; wx += 32) g.fillRect(wx, wy, 16, 20);
     }
-    g.fillStyle = '#5e3b2e'; g.beginPath(); g.moveTo(340, 200); g.lineTo(435, 130); g.lineTo(530, 200); g.closePath(); g.fill();
-    // shaxmat taxtasi
-    for (let i = 0; i < 6; i++) for (let j = 0; j < 6; j++) { g.fillStyle = (i + j) % 2 ? '#111' : '#f5f5f5'; g.fillRect(560 + i * 22, 250 + j * 22, 22, 22); }
-    g.fillStyle = '#1b2a41'; g.font = 'bold 54px sans-serif'; g.fillText('FAST', 60, 455);
+    g.fillStyle = '#5a382b'; g.beginPath(); g.moveTo(338, 206); g.lineTo(436, 134); g.lineTo(534, 206); g.closePath(); g.fill();
+    for (let i = 0; i < 6; i++) for (let j = 0; j < 6; j++) { g.fillStyle = (i + j) % 2 ? '#111' : '#f4f4f4'; g.fillRect(566 + i * 22, 150 + j * 22, 22, 22); }
     return c;
   }
 
+  // ---------- yuklash ----------
   function loadCanvas(src, label) {
-    let w = src.width, h = src.height;
-    const k = Math.min(1, MAX_SIDE / Math.max(w, h));
-    W = Math.max(8, Math.round(w * k)); H = Math.max(8, Math.round(h * k));
+    const k = Math.min(1, MAX_SIDE / Math.max(src.width, src.height));
+    W = Math.max(8, Math.round(src.width * k)); H = Math.max(8, Math.round(src.height * k));
     const c = document.createElement('canvas'); c.width = W; c.height = H;
     const g = c.getContext('2d'); g.drawImage(src, 0, 0, W, H);
     const d = g.getImageData(0, 0, W, H).data;
     base = new Float32Array(W * H);
     for (let i = 0, j = 0; i < base.length; i++, j += 4) base[i] = 0.299 * d[j] + 0.587 * d[j + 1] + 0.114 * d[j + 2];
     view.width = W; view.height = H;
-    $('src').textContent = label;
+    $('src').textContent = label; $('src').title = label;
     sel = null;
-    run();
+    run(true);
   }
-
   function loadFile(f) {
-    if (!f || !f.type.startsWith('image/')) { $('src').textContent = 'Bu fayl rasm emas. JPG yoki PNG fayl tanlang.'; return; }
-    const url = URL.createObjectURL(f);
-    const img = new Image();
-    img.onload = () => { loadCanvas(img, `${f.name}, ${img.naturalWidth}×${img.naturalHeight}` + (Math.max(img.naturalWidth, img.naturalHeight) > MAX_SIDE ? `, tezlik uchun ${MAX_SIDE} pikselgacha kichraytirildi` : '')); URL.revokeObjectURL(url); };
-    img.onerror = () => { $('src').textContent = 'Rasmni ochib bo‘lmadi. Boshqa faylni sinab ko‘ring.'; };
+    if (!f || !f.type.startsWith('image/')) { $('src').textContent = 'Bu fayl rasm emas. JPG yoki PNG tanlang.'; return; }
+    const url = URL.createObjectURL(f), img = new Image();
+    img.onload = () => {
+      const big = Math.max(img.naturalWidth, img.naturalHeight) > MAX_SIDE;
+      loadCanvas(img, `${f.name} · ${img.naturalWidth}×${img.naturalHeight}` + (big ? ` → ${MAX_SIDE}px gacha` : ''));
+      URL.revokeObjectURL(url);
+    };
+    img.onerror = () => { $('src').textContent = 'Rasmni ochib bo‘lmadi. Boshqa fayl tanlang.'; };
     img.src = url;
   }
 
   // ---------- oldindan ishlov: shovqin va Gauss filtri ----------
-  function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function rng(seed) { return () => { seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
   function prepare() {
-    const sigma = +$('noise').value;
     const out = new Float32Array(base);
-    if (sigma > 0) {
+    if (S.noise > 0) {
       const r = rng(12345);
       for (let i = 0; i < out.length; i += 2) {
         const u = Math.max(r(), 1e-9), v = r(), m = Math.sqrt(-2 * Math.log(u));
-        out[i] += sigma * m * Math.cos(2 * Math.PI * v);
-        if (i + 1 < out.length) out[i + 1] += sigma * m * Math.sin(2 * Math.PI * v);
+        out[i] += S.noise * m * Math.cos(2 * Math.PI * v);
+        if (i + 1 < out.length) out[i + 1] += S.noise * m * Math.sin(2 * Math.PI * v);
       }
     }
     let res = out;
-    if ($('blur').checked) {
+    if (S.blur) {
       const s = 1.2, k = [-2, -1, 0, 1, 2].map(x => Math.exp(-x * x / (2 * s * s))), ks = k.reduce((a, b) => a + b);
       const tmp = new Float32Array(out.length); res = new Float32Array(out.length);
       for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { let a = 0; for (let j = -2; j <= 2; j++) a += k[j + 2] * out[y * W + Math.min(W - 1, Math.max(0, x + j))]; tmp[y * W + x] = a / ks; }
@@ -223,34 +397,29 @@ input[type=file] { display: none; }
   }
 
   // ---------- FAST ----------
-  const OFF = () => CIRCLE.map(([dx, dy]) => dy * W + dx);
-  function hasRun(mask, N) {          // aylanada ketma-ket N ta bit bormi (aylana yopiq)
-    let m = mask | (mask << 16), r = m;
+  function hasRun(mask, N) {             // aylanada ketma-ket N ta bit bormi (aylana yopiq)
+    const m = mask | (mask << 16); let r = m;
     for (let j = 1; j < N; j++) r &= m >>> j;
     return (r & 0xFFFF) !== 0;
   }
   function fast(I, t, N, nms) {
-    const off = OFF(), score = new Float32Array(W * H);
-    let tested = 0, passed = 0;
-    const useHS = N >= 12;
-    for (let y = 3; y < H - 3; y++) {
-      for (let x = 3; x < W - 3; x++) {
-        const i = y * W + x, p = I[i], hi = p + t, lo = p - t;
-        tested++;
-        if (useHS) {               // tezkor test: 1, 5, 9, 13-piksellar
-          let b = 0, d = 0;
-          for (const k of [0, 4, 8, 12]) { const v = I[i + off[k]]; if (v > hi) b++; else if (v < lo) d++; }
-          if (b < 3 && d < 3) continue;
-        }
-        passed++;
-        let bm = 0, dm = 0, sb = 0, sd = 0;
-        for (let k = 0; k < 16; k++) {
-          const v = I[i + off[k]];
-          if (v > hi) { bm |= 1 << k; sb += v - p - t; }
-          else if (v < lo) { dm |= 1 << k; sd += p - v - t; }
-        }
-        if (hasRun(bm, N) || hasRun(dm, N)) score[i] = Math.max(sb, sd);
+    const off = CIRCLE.map(([dx, dy]) => dy * W + dx), score = new Float32Array(W * H);
+    let tested = 0, passed = 0; const useHS = N >= 12;
+    for (let y = 3; y < H - 3; y++) for (let x = 3; x < W - 3; x++) {
+      const i = y * W + x, p = I[i], hi = p + t, lo = p - t;
+      tested++;
+      if (useHS) {                       // tezkor test: 1, 5, 9, 13-piksellar
+        let b = 0, d = 0;
+        for (const k of [0, 4, 8, 12]) { const v = I[i + off[k]]; if (v > hi) b++; else if (v < lo) d++; }
+        if (b < 3 && d < 3) continue;
       }
+      passed++;
+      let bm = 0, dm = 0, sb = 0, sd = 0;
+      for (let k = 0; k < 16; k++) {
+        const v = I[i + off[k]];
+        if (v > hi) { bm |= 1 << k; sb += v - p - t; } else if (v < lo) { dm |= 1 << k; sd += p - v - t; }
+      }
+      if (hasRun(bm, N) || hasRun(dm, N)) score[i] = Math.max(sb, sd);
     }
     const pts = [];
     for (let y = 3; y < H - 3; y++) for (let x = 3; x < W - 3; x++) {
@@ -275,91 +444,168 @@ input[type=file] { display: none; }
     const img = vctx.createImageData(W, H);
     for (let i = 0, j = 0; i < gray.length; i++, j += 4) { img.data[j] = img.data[j + 1] = img.data[j + 2] = gray[i]; img.data[j + 3] = 255; }
     vctx.putImageData(img, 0, 0);
-    const lw = Math.max(1.2, W / 600);
-    if ($('show').checked) {
-      vctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--kp').trim();
-      vctx.lineWidth = lw;
-      for (const [x, y] of kps) { vctx.beginPath(); vctx.arc(x + .5, y + .5, 3.5 * lw, 0, Math.PI * 2); vctx.stroke(); }
+    const u = Math.max(1, W / 640);
+    if (S.show) {
+      vctx.lineWidth = 1.4 * u;
+      vctx.strokeStyle = 'rgba(0,0,0,.55)';
+      for (const [x, y] of kps) { vctx.beginPath(); vctx.arc(x + .5, y + .5, 3.6 * u, 0, Math.PI * 2); vctx.stroke(); }
+      vctx.strokeStyle = css('--kp'); vctx.lineWidth = 1.2 * u;
+      for (const [x, y] of kps) { vctx.beginPath(); vctx.arc(x + .5, y + .5, 3.6 * u, 0, Math.PI * 2); vctx.stroke(); }
     }
     if (sel) {
-      vctx.strokeStyle = '#ffd400'; vctx.lineWidth = lw * 1.6;
-      vctx.strokeRect(sel[0] - 5, sel[1] - 5, 11, 11);
+      const [x, y] = sel, r = 7 * u;
+      vctx.strokeStyle = '#ffd400'; vctx.lineWidth = 2 * u;
+      vctx.strokeRect(x - r, y - r, 2 * r + 1, 2 * r + 1);
+      vctx.beginPath(); vctx.moveTo(x - 2.2 * r, y + .5); vctx.lineTo(x - r, y + .5); vctx.moveTo(x + r + 1, y + .5); vctx.lineTo(x + 2.2 * r, y + .5);
+      vctx.moveTo(x + .5, y - 2.2 * r); vctx.lineTo(x + .5, y - r); vctx.moveTo(x + .5, y + r + 1); vctx.lineTo(x + .5, y + 2.2 * r); vctx.stroke();
     }
   }
 
-  function circularMaxRun(mask) {
-    if (mask === 0xFFFF) return 16;
-    let best = 0, cur = 0;
-    for (let k = 0; k < 32; k++) { if (mask >> (k % 16) & 1) { cur++; best = Math.max(best, cur); } else cur = 0; }
-    return Math.min(best, 16);
-  }
-
-  function drawZoom() {
-    const cell = 20; zctx.clearRect(0, 0, 180, 180);
-    if (!sel) { $('verdict').textContent = '–'; $('pinfo').textContent = 'Tasvirdagi biror pikselga bosing.'; $('formula').textContent = ''; return; }
-    const [cx, cy] = sel, t = +$('t').value, N = +$('n').value;
-    const p = gray[cy * W + cx], hi = p + t, lo = p - t;
-    const css = getComputedStyle(document.documentElement);
-    const colB = css.getPropertyValue('--bright').trim(), colD = css.getPropertyValue('--dark').trim();
-    for (let dy = -4; dy <= 4; dy++) for (let dx = -4; dx <= 4; dx++) {
-      const x = Math.min(W - 1, Math.max(0, cx + dx)), y = Math.min(H - 1, Math.max(0, cy + dy)), v = gray[y * W + x];
-      zctx.fillStyle = `rgb(${v},${v},${v})`; zctx.fillRect((dx + 4) * cell, (dy + 4) * cell, cell, cell);
+  function longestRun(mask) {            // aylanadagi eng uzun ketma-ketlik: [uzunlik, boshlanish]
+    if (mask === 0xFFFF) return [16, 0];
+    let best = 0, start = -1, cur = 0, cs = 0;
+    for (let k = 0; k < 32; k++) {
+      if (mask >> (k % 16) & 1) { if (!cur) cs = k % 16; cur++; if (cur > best) { best = cur; start = cs; } } else cur = 0;
     }
-    let bm = 0, dm = 0;
-    zctx.font = 'bold 10px IBM Plex Mono, monospace'; zctx.textAlign = 'center'; zctx.textBaseline = 'middle';
-    CIRCLE.forEach(([dx, dy], k) => {
-      const v = gray[(cy + dy) * W + cx + dx];
-      let col = '#c7ced8';
-      if (v > hi) { bm |= 1 << k; col = colB; } else if (v < lo) { dm |= 1 << k; col = colD; }
-      const X = (dx + 4) * cell, Y = (dy + 4) * cell;
-      zctx.lineWidth = 3; zctx.strokeStyle = col; zctx.strokeRect(X + 1.5, Y + 1.5, cell - 3, cell - 3);
-      zctx.fillStyle = v > 140 ? '#000' : '#fff'; zctx.fillText(String(k + 1), X + cell / 2, Y + cell / 2 + 1);
-    });
-    zctx.lineWidth = 3; zctx.strokeStyle = '#ffd400'; zctx.strokeRect(4 * cell + 1.5, 4 * cell + 1.5, cell - 3, cell - 3);
-    zctx.fillStyle = p > 140 ? '#000' : '#fff'; zctx.fillText('p', 4 * cell + cell / 2, 4 * cell + cell / 2 + 1);
-
-    const rb = circularMaxRun(bm), rd = circularMaxRun(dm);
-    const isCorner = rb >= N || rd >= N;
-    const v = $('verdict'); v.textContent = isCorner ? 'Burchak' : 'Burchak emas'; v.className = 'verdict ' + (isCorner ? 'yes' : 'no');
-    $('pinfo').innerHTML = `(${cx}, ${cy})<br>I<sub>p</sub> = ${p}, t = ${t}<br>ketma-ket yorqin: ${rb}<br>ketma-ket qorong‘i: ${rd}`;
-    $('formula').innerHTML = `yorqinroq: I &gt; ${p}+${t} = ${p + t}<br>qorong‘iroq: I &lt; ${p}−${t} = ${p - t}<br>shart: ketma-ket ≥ ${N} ta → ${isCorner ? 'bajarildi' : 'bajarilmadi'}` + (isCorner && $('nms').checked && !kps.some(k => k[0] === cx && k[1] === cy) ? '<br>(NMS: qo‘shni nuqta kuchliroq, shuning uchun bu nuqta tashlandi)' : '');
+    return [Math.min(best, 16), start];
   }
 
-  function run() {
+  function drawLoupe() {
+    const cell = 80; zctx.clearRect(0, 0, 560, 560);
+    const kv = $('kv'), v = $('verdict');
+    if (!sel) { v.textContent = '–'; v.className = 'verdict no'; kv.innerHTML = ''; $('calc').textContent = 'Tasvirdagi istalgan pikselga bosing.'; $('cells').innerHTML = ''; $('runCap').textContent = ''; return; }
+    const [cx, cy] = sel, { t, N } = S, p = gray[cy * W + cx], hi = p + t, lo = p - t;
+    const warm = css('--warm'), cool = css('--cool');
+    const cls = new Array(16); let bm = 0, dm = 0;
+    CIRCLE.forEach(([dx, dy], k) => { const q = gray[(cy + dy) * W + cx + dx]; if (q > hi) { bm |= 1 << k; cls[k] = 'b'; } else if (q < lo) { dm |= 1 << k; cls[k] = 'd'; } else cls[k] = 's'; });
+    const idx = {}; CIRCLE.forEach(([dx, dy], k) => idx[dx + ',' + dy] = k);
+    zctx.textAlign = 'center'; zctx.textBaseline = 'middle';
+    for (let dy = -3; dy <= 3; dy++) for (let dx = -3; dx <= 3; dx++) {
+      const x = cx + dx, y = cy + dy, q = gray[y * W + x], X = (dx + 3) * cell, Y = (dy + 3) * cell;
+      zctx.fillStyle = `rgb(${q},${q},${q})`; zctx.fillRect(X, Y, cell, cell);
+      const k = idx[dx + ',' + dy], fg = q > 135 ? '#0e1a2b' : '#ffffff';
+      if (k !== undefined) {
+        const col = cls[k] === 'b' ? warm : cls[k] === 'd' ? cool : '#9aa4b2';
+        zctx.lineWidth = 8; zctx.strokeStyle = col; zctx.strokeRect(X + 5, Y + 5, cell - 10, cell - 10);
+        zctx.fillStyle = col; zctx.fillRect(X + 5, Y + 5, 26, 21);
+        zctx.fillStyle = '#fff'; zctx.font = '700 15px JetBrains Mono, monospace'; zctx.fillText(String(k + 1), X + 18, Y + 16);
+      }
+      zctx.fillStyle = fg; zctx.font = (dx || dy ? '600 19px' : '800 22px') + ' JetBrains Mono, monospace';
+      zctx.fillText(String(q), X + cell / 2 + (k !== undefined ? 6 : 0), Y + cell / 2 + (k !== undefined ? 9 : 0));
+    }
+    zctx.lineWidth = 6; zctx.strokeStyle = '#ffd400'; zctx.strokeRect(3 * cell + 3, 3 * cell + 3, cell - 6, cell - 6);
+    zctx.strokeStyle = 'rgba(255,255,255,.12)'; zctx.lineWidth = 1;
+    for (let i = 1; i < 7; i++) { zctx.beginPath(); zctx.moveTo(i * cell, 0); zctx.lineTo(i * cell, 560); zctx.moveTo(0, i * cell); zctx.lineTo(560, i * cell); zctx.stroke(); }
+
+    const [rb, sb] = longestRun(bm), [rd, sd] = longestRun(dm);
+    const useB = rb >= rd, run = useB ? rb : rd, rs = useB ? sb : sd;
+    const isCorner = run >= N;
+    const inList = kps.some(k => k[0] === cx && k[1] === cy);
+    v.textContent = isCorner ? '● Burchak' : '○ Burchak emas'; v.className = 'verdict ' + (isCorner ? 'yes' : 'no');
+    kv.innerHTML = `<dt>(x, y)</dt><dd>${cx}, ${cy}</dd><dt>I<sub>p</sub></dt><dd>${p}</dd><dt>t</dt><dd>${t}</dd><dt>ketma-ket yorqin</dt><dd>${rb}</dd><dt>ketma-ket qorong‘i</dt><dd>${rd}</dd><dt>kerak (N)</dt><dd>${N}</dd>`;
+    const runSet = new Set(); if (run > 0) for (let j = 0; j < run; j++) runSet.add((rs + j) % 16);
+    $('cells').innerHTML = cls.map((c, k) => `<div class="${c === 's' ? 's' : ''}${runSet.has(k) ? ' run' : ''}" style="background:${c === 'b' ? warm : c === 'd' ? cool : css('--same')}">${k + 1}</div>`).join('');
+    $('runCap').textContent = run ? `eng uzun: ${run} ta ${useB ? 'yorqin' : 'qorong‘i'}` : 'ketma-ketlik yo‘q';
+    $('calc').innerHTML = `yorqinroq:   I &gt; ${p} + ${t} = ${p + t}<br>qorong‘iroq: I &lt; ${p} − ${t} = ${p - t}<br>shart: ketma-ket ${run} ≥ ${N} → ` +
+      (isCorner ? '<span class="ok">bajarildi, burchak</span>' : '<span class="bad">bajarilmadi</span>') +
+      (isCorner && S.nms && !inList ? '<br>NMS: yonidagi qo‘shni javobi kattaroq, shu sababli bu nuqta tashlandi' : '');
+    $('tag').textContent = `p = (${cx}, ${cy}) · I = ${p}`;
+  }
+
+  // ---------- threshold grafigi ----------
+  function drawCurve(data) {
+    const svg = $('curve'), Wd = Math.max(280, Math.round(svg.getBoundingClientRect().width) || 800), Hd = 150, L = 46, R = 12, T = 10, B = 26;
+    svg.setAttribute('viewBox', `0 0 ${Wd} ${Hd}`);
+    const xs = t => L + (t - 5) / 95 * (Wd - L - R);
+    const maxV = Math.max(10, ...data.map(d => d[1]));
+    const top = Math.pow(10, Math.ceil(Math.log10(maxV)));
+    const ys = v => T + (1 - Math.log10(Math.max(1, v)) / Math.log10(top)) * (Hd - T - B);
+    let s = '';
+    for (let e = 0; Math.pow(10, e) <= top; e++) {
+      const y = ys(Math.pow(10, e));
+      s += `<line x1="${L}" x2="${Wd - R}" y1="${y}" y2="${y}" stroke="#e7ebf1" vector-effect="non-scaling-stroke"/><text x="${L - 8}" y="${y + 4}" text-anchor="end" font-size="11" fill="#5d687a" font-family="JetBrains Mono">${Math.pow(10, e) >= 1000 ? Math.pow(10, e) / 1000 + 'k' : Math.pow(10, e)}</text>`;
+    }
+    for (const t of [5, 25, 50, 75, 100]) s += `<text x="${xs(t)}" y="${Hd - 8}" text-anchor="middle" font-size="11" fill="#5d687a" font-family="JetBrains Mono">${t}</text>`;
+    if (data.length) {
+      const pts = data.map(([t, v]) => `${xs(t)},${ys(v)}`).join(' ');
+      s += `<polygon points="${xs(data[0][0])},${Hd - B} ${pts} ${xs(data[data.length - 1][0])},${Hd - B}" fill="rgba(42,111,219,.10)"/>`;
+      s += `<polyline points="${pts}" fill="none" stroke="#2a6fdb" stroke-width="2.2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`;
+    }
+    const cx = xs(S.t), cy = ys(Math.max(1, kps.length));
+    s += `<line x1="${cx}" x2="${cx}" y1="${T}" y2="${Hd - B}" stroke="#0e1a2b" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/><circle cx="${cx}" cy="${cy}" r="5" fill="#ef5a2a" stroke="#fff" stroke-width="2"/>`;
+    svg.innerHTML = s;
+  }
+  let curveData = [];
+  function computeCurve() {
+    const job = ++curveJob, ts = []; for (let t = 5; t <= 100; t += 5) ts.push(t);
+    const out = []; $('curveNote').textContent = 'hisoblanmoqda…';
+    const step = () => {
+      if (job !== curveJob) return;
+      const t = ts[out.length]; out.push([t, fast(gray, t, S.N, S.nms).pts.length]);
+      curveData = out.slice(); drawCurve(curveData);
+      if (out.length < ts.length) setTimeout(step, 0);
+      else $('curveNote').textContent = `N = ${S.N}${S.nms ? ', NMS' : ''}${S.noise ? `, σ = ${S.noise}` : ''} · logarifmik shkala`;
+    };
+    setTimeout(step, 30);
+  }
+
+  // ---------- asosiy ishga tushirish ----------
+  function run(recurve) {
     gray = prepare();
-    const t = +$('t').value, N = +$('n').value, nms = $('nms').checked;
     const t0 = performance.now();
-    const r = fast(gray, t, N, nms);
+    const r = fast(gray, S.t, S.N, S.nms);
     const ms = performance.now() - t0;
     kps = r.pts;
     if (!sel && kps.length) { const best = kps.reduce((a, b) => (b[2] > a[2] ? b : a)); sel = [best[0], best[1]]; }
-    $('sCount').textContent = kps.length.toLocaleString('uz');
+    $('sCount').textContent = kps.length.toLocaleString('ru-RU');
     $('sTime').textContent = ms.toFixed(1);
     $('sPass').textContent = r.pass == null ? '–' : (r.pass * 100).toFixed(1) + '%';
     $('sSize').textContent = `${W}×${H}`;
-    draw(); drawZoom();
+    draw(); drawLoupe();
+    if (recurve) computeCurve(); else drawCurve(curveData);
   }
 
-  // ---------- hodisalar ----------
+  // ---------- boshqaruv ----------
+  const fill = el => el.style.setProperty('--p', ((el.value - el.min) / (el.max - el.min) * 100) + '%');
+  function sync() {
+    $('t').value = S.t; $('tOut').textContent = S.t; fill($('t'));
+    $('noise').value = S.noise; $('noiseOut').textContent = S.noise; fill($('noise'));
+    $('nOut').textContent = S.N;
+    document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.n === S.N)));
+    $('nms').checked = S.nms; $('blur').checked = S.blur; $('show').checked = S.show;
+  }
   $('pick').addEventListener('click', () => $('file').click());
-  $('file').addEventListener('change', e => loadFile(e.target.files[0]));
-  $('demo').addEventListener('click', () => loadCanvas(demoImage(), 'Namuna tasvir. Rasmni shu yerga tashlashingiz ham mumkin. Pikselga bosing: lupada uning aylanasi chiqadi.'));
-  const wrap = $('wrap');
-  ['dragenter', 'dragover'].forEach(ev => wrap.addEventListener(ev, e => { e.preventDefault(); wrap.classList.add('drag'); }));
-  ['dragleave', 'drop'].forEach(ev => wrap.addEventListener(ev, e => { e.preventDefault(); wrap.classList.remove('drag'); }));
-  wrap.addEventListener('drop', e => loadFile(e.dataTransfer.files[0]));
+  $('file').addEventListener('change', e => { loadFile(e.target.files[0]); e.target.value = ''; });
+  $('demo').addEventListener('click', () => loadCanvas(demoImage(), 'Namuna tasvir'));
+  const stage = $('stage');
+  ['dragenter', 'dragover'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); stage.classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach(ev => document.addEventListener(ev, e => { e.preventDefault(); if (ev === 'drop' || !e.relatedTarget) stage.classList.remove('drag'); }));
+  document.addEventListener('drop', e => { if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
   view.addEventListener('click', e => {
     const r = view.getBoundingClientRect();
     const x = Math.floor((e.clientX - r.left) * W / r.width), y = Math.floor((e.clientY - r.top) * H / r.height);
     sel = [Math.min(W - 4, Math.max(3, x)), Math.min(H - 4, Math.max(3, y))];
-    draw(); drawZoom();
+    draw(); drawLoupe();
   });
-  $('t').addEventListener('input', () => { $('tOut').textContent = $('t').value; run(); });
-  $('noise').addEventListener('input', () => { $('noiseOut').textContent = $('noise').value; run(); });
-  ['n', 'nms', 'blur'].forEach(id => $(id).addEventListener('change', run));
-  $('show').addEventListener('change', draw);
+  let tTimer;
+  $('t').addEventListener('input', e => { S.t = +e.target.value; sync(); run(false); });
+  $('noise').addEventListener('input', e => { S.noise = +e.target.value; sync(); run(false); clearTimeout(tTimer); tTimer = setTimeout(computeCurve, 250); });
+  document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => { S.N = +b.dataset.n; sync(); run(true); }));
+  $('nms').addEventListener('change', e => { S.nms = e.target.checked; run(true); });
+  $('blur').addEventListener('change', e => { S.blur = e.target.checked; run(true); });
+  $('show').addEventListener('change', e => { S.show = e.target.checked; draw(); });
+  const PRESETS = {
+    std:    { t: 25, N: 9, noise: 0, nms: true, blur: false },
+    strong: { t: 60, N: 9, noise: 0, nms: true, blur: false },
+    nonms:  { t: 25, N: 9, noise: 0, nms: false, blur: false },
+    noise:  { t: 25, N: 9, noise: 20, nms: true, blur: false },
+    fix:    { t: 25, N: 9, noise: 20, nms: true, blur: true },
+  };
+  document.querySelectorAll('.presets button').forEach(b => b.addEventListener('click', () => { Object.assign(S, PRESETS[b.dataset.p], { show: true }); sync(); run(true); }));
 
-  loadCanvas(demoImage(), 'Namuna tasvir. Rasmni shu yerga tashlashingiz ham mumkin. Pikselga bosing: lupada uning aylanasi chiqadi.');
+  let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => drawCurve(curveData), 120); });
+  sync();
+  loadCanvas(demoImage(), 'Namuna tasvir');
 })();
 </script>
 </body>
