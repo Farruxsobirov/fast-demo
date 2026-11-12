@@ -63,9 +63,9 @@ a { color: var(--accent); }
 .steps span { font-family: var(--font-mono); font-size: 12px; font-weight: 600; background: var(--ink); color: #fff; border-radius: 6px; padding: 4px 9px; }
 
 /* ---------- asosiy ish maydoni ---------- */
-.work { display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-areas: "viewer side" "how side"; grid-template-rows: auto 1fr; gap: 20px; align-items: start; }
-.work > .viewer { grid-area: viewer; } .work > .side { grid-area: side; } .work > .how { grid-area: how; }
-@media (max-width: 1080px) { .work { grid-template-columns: 1fr; grid-template-rows: auto; grid-template-areas: "viewer" "side" "how"; } }
+.work { display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-areas: "viewer side" "ana side" "how side"; grid-template-rows: auto auto 1fr; gap: 20px; align-items: start; }
+.work > .viewer { grid-area: viewer; } .work > .side { grid-area: side; } .work > .how { grid-area: how; } .work > .ana { grid-area: ana; }
+@media (max-width: 1080px) { .work { grid-template-columns: 1fr; grid-template-rows: auto; grid-template-areas: "viewer" "side" "ana" "how"; } }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); }
 .pad { padding: 18px; }
 .label { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; }
@@ -163,6 +163,38 @@ input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border-radius: 
 .calc .ok { color: #08713c; font-weight: 700; } .calc .bad { color: #a23b1b; font-weight: 700; }
 
 /* ---------- qanday ishlaydi ---------- */
+.ana .head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+.ana h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(18px, 1.8vw, 22px); margin: 0; }
+.ana .pix { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.astep { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); }
+.astep:first-of-type { border-top: 0; }
+.astep .n { width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: #fff; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; }
+.astep h3 { font-size: 15px; margin: 4px 0 8px; }
+.astep p { margin: 6px 0 0; font-size: 14px; color: var(--ink); }
+.astep .mono, .astep code { font-family: var(--font-mono); font-size: 13px; }
+.thr { display: flex; gap: 8px; flex-wrap: wrap; }
+.thr span { font-family: var(--font-mono); font-size: 13px; border-radius: 8px; padding: 5px 10px; background: var(--paper); border: 1px solid var(--line); }
+.thr .b { border-color: #f6b9a3; background: #fff1eb; } .thr .d { border-color: #b3cdf4; background: #eef4fe; }
+.atable { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.atable th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 700; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+.atable td { padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.atable td.mono { font-family: var(--font-mono); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.atable tr:last-child td { border-bottom: 0; }
+.tw { overflow-x: auto; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 12.5px; white-space: nowrap; }
+.pill i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+.res { display: inline-block; font-family: var(--font-mono); font-weight: 700; font-size: 13px; padding: 3px 9px; border-radius: 6px; margin-top: 8px; }
+.res.ok { background: #dcf8e8; color: #08713c; } .res.bad { background: #fde9e1; color: #a23b1b; } .res.skip { background: var(--paper); color: var(--muted); }
+.vsum { font-family: var(--font-mono); font-size: 13px; line-height: 1.75; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; overflow-x: auto; }
+.nmsgrid { display: inline-grid; grid-template-columns: repeat(3, 86px); gap: 4px; margin-top: 4px; }
+.nmsgrid div { font-family: var(--font-mono); font-size: 13px; font-weight: 600; text-align: center; padding: 9px 4px; border-radius: 8px; background: var(--paper); border: 1px solid var(--line); }
+.nmsgrid div.zero { color: #9aa4b2; font-weight: 400; }
+.nmsgrid div.me { outline: 3px solid #ffd400; outline-offset: -3px; }
+.nmsgrid div.max { background: #dcf8e8; border-color: #9fe0bb; color: #07733c; }
+.nmsrow { display: flex; gap: 18px; align-items: flex-start; flex-wrap: wrap; }
+.verdictbox { border-radius: 12px; padding: 12px 14px; font-size: 14px; }
+.verdictbox b { font-family: var(--font-display); font-size: 16px; display: block; margin-bottom: 4px; }
+.verdictbox.yes { background: #e3f9ec; } .verdictbox.no { background: #f1f3f6; } .verdictbox.drop { background: #fff4e5; }
 .how { margin: 4px 0 0; }
 .how h2 { font-family: var(--font-display); font-weight: 700; font-size: clamp(20px, 2vw, 26px); margin: 0 0 14px; }
 .how .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
@@ -305,6 +337,11 @@ input[type=file] { display: none; }
         <ol class="checks" id="checks"></ol>
       </section>
     </aside>
+
+  <section class="card pad ana" id="ana" aria-live="polite">
+    <div class="head"><h2>Hisob-kitob tahlili</h2><span class="pix" id="anaPix"></span></div>
+    <div id="anaBody"></div>
+  </section>
 
   <section class="how">
       <h2>Algoritm qanday ishlaydi</h2>
@@ -563,10 +600,131 @@ input[type=file] { display: none; }
     return (hasRun(bm, S.N) || hasRun(dm, S.N)) ? Math.max(sb, sd) : 0;
   }
 
+  // ---------- hisob-kitob tahlili ----------
+  const fmt = n => String(n);
+  function circRuns(cls, want) {         // aylanadagi ketma-ket guruhlar (yopiq aylana): [[start, len], ...]
+    const runs = []; if (cls.every(c => c === want)) return [[0, 16]];
+    let k0 = cls.findIndex((c, k) => c !== want);   // uzilish nuqtasidan boshlaymiz
+    let cur = null;
+    for (let j = 1; j <= 16; j++) {
+      const k = (k0 + j) % 16;
+      if (cls[k] === want) { if (cur) cur[1]++; else cur = [k, 1]; }
+      else if (cur) { runs.push(cur); cur = null; }
+    }
+    if (cur) runs.push(cur);
+    return runs;
+  }
+  const idxList = (s, n) => { const a = []; for (let j = 0; j < n; j++) a.push((s + j) % 16 + 1); return a; };
+  const rangeTxt = (s, n) => {
+    const a = idxList(s, n);
+    if (n === 1) return `${a[0]}`;
+    const wraps = a.some((v, i) => i && v < a[i - 1]);
+    if (!wraps) return n > 3 ? `${a[0]} … ${a[n - 1]}` : a.join(', ');
+    const cut = a.findIndex((v, i) => i && v < a[i - 1]);
+    const p1 = a.slice(0, cut), p2 = a.slice(cut);
+    const part = x => x.length > 2 ? `${x[0]} … ${x[x.length - 1]}` : x.join(', ');
+    return `${part(p1)}, ${part(p2)}`;
+  };
+  function renderAnalysis(cx, cy) {
+    const body = $('anaBody');
+    if (!sel) { body.innerHTML = '<p class="hint">Tasvirdagi istalgan pikselga bosing: bu yerda uning to‘liq hisob-kitobi chiqadi.</p>'; $('anaPix').textContent = ''; return; }
+    const { t, N } = S, i0 = cy * W + cx, p = gray[i0], hi = p + t, lo = p - t;
+    const vals = CIRCLE.map(([dx, dy]) => gray[i0 + dy * W + dx]);
+    const cls = vals.map(v => v > hi ? 'b' : v < lo ? 'd' : 's');
+    const name = { b: 'yorqinroq', d: 'qorong‘iroq', s: 'o‘xshash' };
+    const col = { b: css('--warm'), d: css('--cool'), s: css('--same') };
+    $('anaPix').textContent = `piksel (${cx}, ${cy}) · t = ${t} · N = ${N}`;
+
+    // 2-qadam: guruhlangan jadval (ketma-ket bir xil sinf)
+    const groups = []; let start = 0;
+    for (let k = 1; k <= 16; k++) if (k === 16 || cls[k] !== cls[start]) { groups.push([start, k - start]); start = k; }
+    const rows = groups.map(([s0, n]) => {
+      const c = cls[s0], vs = vals.slice(s0, s0 + n), same = vs.every(v => v === vs[0]);
+      const ids = n === 1 ? `${s0 + 1}` : `${s0 + 1} … ${s0 + n}`;
+      const vtxt = same ? fmt(vs[0]) : vs.join(', ');
+      let cmp;
+      if (c === 'b') cmp = same ? `${vs[0]} &gt; ${hi}` : `hammasi &gt; ${hi}`;
+      else if (c === 'd') cmp = same ? `${vs[0]} &lt; ${lo}` : `hammasi &lt; ${lo}`;
+      else cmp = same ? `${lo} ≤ ${vs[0]} ≤ ${hi}` : `hammasi ${lo} … ${hi} oralig‘ida`;
+      return `<tr><td class="mono">${ids}${n > 1 ? ` <span style="color:var(--muted)">(${n} ta)</span>` : ''}</td><td class="mono">${vtxt}</td><td class="mono">${cmp}</td><td><span class="pill"><i style="background:${col[c]}"></i>${name[c]}</span></td></tr>`;
+    }).join('');
+    const nb = cls.filter(c => c === 'b').length, nd = cls.filter(c => c === 'd').length, ns = 16 - nb - nd;
+
+    // 3-qadam: ketma-ketlik
+    const rb = circRuns(cls, 'b'), rd = circRuns(cls, 'd');
+    const best = arr => arr.reduce((a, r) => (r[1] > (a ? a[1] : 0) ? r : a), null);
+    const bb = best(rb), bd = best(rd);
+    const useB = (bb ? bb[1] : 0) >= (bd ? bd[1] : 0);
+    const top = useB ? bb : bd, run = top ? top[1] : 0, kind = useB ? 'yorqin' : 'qorong‘i';
+    const seg = run >= N;
+    let runTxt;
+    if (!top) runTxt = `Aylanada na yorqinroq, na qorong‘iroq piksel bor: <b>ketma-ketlik 0 ta</b>.`;
+    else {
+      const a = idxList(top[0], top[1]); const wraps = a.some((v, i) => i && v < a[i - 1]);
+      runTxt = `Eng uzun ketma-ketlik: <b>${rangeTxt(top[0], top[1])}</b>-piksellar, ya’ni <b>${run} ta ${kind}</b>.` +
+        (wraps ? ` Aylana yopiq: 16-dan keyin yana 1 keladi, shuning uchun ketma-ketlik 16 → 1 orqali davom etadi.` : '');
+      const endK = (top[0] + top[1]) % 16, before = (top[0] + 15) % 16;
+      if (run < 16) runTxt += ` U ${before + 1}-pikselda (${vals[before]}, ${name[cls[before]]}) va ${endK + 1}-pikselda (${vals[endK]}, ${name[cls[endK]]}) uziladi.`;
+      const other = useB ? bd : bb;
+      runTxt += other ? ` ${useB ? 'Qorong‘iroq' : 'Yorqinroq'} piksellarning eng uzun ketma-ketligi: ${other[1]} ta.` : ` ${useB ? 'Qorong‘iroq' : 'Yorqinroq'} piksel yo‘q.`;
+    }
+
+    // 4-qadam: javob V
+    const sumOf = c => {
+      const terms = []; let total = 0;
+      const byVal = new Map();
+      vals.forEach((v, k) => { if (cls[k] === c) byVal.set(v, (byVal.get(v) || 0) + 1); });
+      for (const [v, n] of [...byVal.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])) {
+        const d = c === 'b' ? v - p - t : p - v - t; total += d * n;
+        const ex = c === 'b' ? `(${v} − ${p} − ${t})` : `(${p} − ${v} − ${t})`;
+        terms.push(n > 1 ? `${ex} × ${n} = ${d} × ${n} = ${d * n}` : `${ex} = ${d}`);
+      }
+      return { terms, total };
+    };
+    const SB = sumOf('b'), SD = sumOf('d'), V = seg ? Math.max(SB.total, SD.total) : 0;
+    const vBlock = seg ? `<div class="vsum">${SB.terms.length ? `<b>Yorqinroq piksellar:</b><br>${SB.terms.join('<br>')}<br>Σ yorqin = <b>${SB.total}</b>` : 'Yorqinroq piksel yo‘q: Σ yorqin = 0'}<br><br>${SD.terms.length ? `<b>Qorong‘iroq piksellar:</b><br>${SD.terms.join('<br>')}<br>Σ qorong‘i = <b>${SD.total}</b>` : 'Qorong‘iroq piksel yo‘q: Σ qorong‘i = 0'}<br><br><b>V = max(${SB.total}, ${SD.total}) = ${V}</b></div>`
+      : `<p>Segment testdan o‘tmagani uchun javob V hisoblanmaydi (V = 0).</p>`;
+
+    // 5-qadam: NMS 3x3
+    const inList = kps.some(k => k[0] === cx && k[1] === cy);
+    const nbr = []; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) nbr.push([dx, dy, scoreAt(cx + dx, cy + dy)]);
+    const mx = Math.max(...nbr.map(n => n[2]));
+    const others = nbr.filter(n => n[0] || n[1]), mo = others.reduce((a, n) => (n[2] > a[2] ? n : a), others[0]);
+    const grid = nbr.map(([dx, dy, v]) => `<div class="${!v ? 'zero' : ''}${!dx && !dy ? ' me' : ''}${v && v === mx ? ' max' : ''}" title="(${cx + dx}, ${cy + dy})">${v || '0'}</div>`).join('');
+    let nmsTxt, nmsRes;
+    if (!seg) { nmsTxt = 'Segment testdan o‘tmagani uchun NMS tekshirilmaydi.'; nmsRes = ['skip', 'tekshirilmaydi']; }
+    else if (!S.nms) { nmsTxt = 'NMS o‘chirilgan: segment testdan o‘tgan har bir piksel natijaga kiradi.'; nmsRes = ['skip', 'NMS o‘chirilgan']; }
+    else if (inList) { nmsTxt = mo[2] ? `Markaz V = ${V}, qo‘shnilarning eng kattasi ${mo[2]} (${cx + mo[0]}, ${cy + mo[1]}). ${V} ≥ ${mo[2]}, demak bu piksel 3×3 sohada eng kuchli.` : `Qo‘shnilarning hech biri burchak emas (hammasida V = 0), raqobatchi yo‘q.`; nmsRes = ['ok', 'qoldi']; }
+    else { nmsTxt = `Markaz V = ${V}, lekin qo‘shni (${cx + mo[0]}, ${cy + mo[1]}) da V = ${mo[2]}. ${mo[2]} ${mo[2] > V ? '>' : '='} ${V}, shuning uchun bitta burchakni o‘sha qo‘shni ifodalaydi.`; nmsRes = ['bad', 'olib tashlandi']; }
+
+    // Xulosa: nima uchun
+    const diff = nb + nd, pct = Math.round(run / 16 * 100);
+    let why, wcls;
+    if (inList) { wcls = 'yes'; why = `<b>● Burchak</b>Aylananing ${run}/16 qismi (${pct}%) ketma-ket ${kind} — bu N = ${N} dan ko‘p. Yorqinlik bir nechta yo‘nalishda keskin o‘zgaradi: p burchak ustida turibdi.`; }
+    else if (seg) { wcls = 'drop'; why = `<b>○ Burchak emas (NMS)</b>Piksel burchak sohasida turibdi (${run} ≥ ${N}), lekin shu burchakni yonidagi kuchliroq piksel ifodalaydi. Har bir burchak bitta nuqta bilan belgilanadi.`; }
+    else if (diff === 0) { wcls = 'no'; why = `<b>○ Burchak emas: tekis soha</b>Aylanadagi 16 pikselning hammasi markazga o‘xshash (farqi ${t} dan kichik). Bunday joyni boshqa tasvirda aniq topib bo‘lmaydi.`; }
+    else if (run >= 5 && diff <= 9) { wcls = 'no'; why = `<b>○ Burchak emas: qirra (to‘g‘ri chiziq)</b>Aylananing faqat ${run}/16 qismi (${pct}%) farq qiladi, ya’ni yarmiga yaqini. Bu ikki soha orasidagi chiziqqa xos: yorqinlik bitta yo‘nalishdagina o‘zgaradi. Burchak uchun kamida ${N} ta kerak.`; }
+    else { wcls = 'no'; why = `<b>○ Burchak emas</b>${diff} ta piksel markazdan farq qiladi, lekin ular ketma-ket emas (eng uzuni ${run} ta). Bu tekstura yoki shovqinga xos: farqli piksellar aylana bo‘ylab tarqoq joylashgan.`; }
+
+    body.innerHTML = `
+      <div class="astep"><div class="n">1</div><div><h3>Chegaralarni hisoblash</h3>
+        <div class="thr"><span>${tb('ip', 'I<sub>p</sub>')} = ${p}</span><span>${tb('t', 't')} = ${t}</span><span class="b">yorqinroq: I &gt; ${p} + ${t} = ${hi}</span><span class="d">qorong‘iroq: I &lt; ${p} − ${t} = ${lo}</span><span>o‘xshash: ${lo} … ${hi}</span></div></div></div>
+      <div class="astep"><div class="n">2</div><div><h3>16 ta pikselni ${tb('sinf', 'sinflarga ajratish')}</h3>
+        <div class="tw"><table class="atable"><thead><tr><th>Piksellar</th><th>Qiymati</th><th>Solishtirish</th><th>Sinf</th></tr></thead><tbody>${rows}</tbody></table></div>
+        <p>Jami: ${nb} ta yorqinroq, ${nd} ta qorong‘iroq, ${ns} ta o‘xshash.</p></div></div>
+      <div class="astep"><div class="n">3</div><div><h3>${tb('ketma', 'Ketma-ketlikni')} sanash (${tb('segment', 'segment test')})</h3>
+        <p>${runTxt}</p>
+        <span class="res ${seg ? 'ok' : 'bad'}">${run} ${seg ? '≥' : '<'} ${N} → ${seg ? 'bajarildi ✓' : 'bajarilmadi ✗'}</span></div></div>
+      <div class="astep"><div class="n">4</div><div><h3>${tb('javob', 'Javob V')}: farqlar yig‘indisi</h3>${vBlock}</div></div>
+      <div class="astep"><div class="n">5</div><div><h3>${tb('nms', 'NMS')}: 3×3 qo‘shnilar bilan solishtirish</h3>
+        <div class="nmsrow"><div class="nmsgrid" aria-label="3×3 sohadagi V qiymatlari">${grid}</div><p style="flex:1;min-width:220px;margin:0">${nmsTxt}<br><span class="res ${nmsRes[0]}">${nmsRes[1]}</span></p></div></div></div>
+      <div class="astep"><div class="n">✓</div><div><h3>Xulosa: nima uchun?</h3><div class="verdictbox ${wcls}">${why}</div></div></div>`;
+  }
+
   function drawLoupe() {
     const cell = 80; zctx.clearRect(0, 0, 560, 560);
     const kv = $('kv'), v = $('verdict');
-    if (!sel) { v.textContent = '–'; $('decision').className = 'decision no'; $('why').textContent = 'Tasvirdagi istalgan pikselga bosing.'; kv.innerHTML = ''; $('calc').textContent = ''; $('checks').innerHTML = ''; $('cells').innerHTML = ''; $('runCap').textContent = ''; return; }
+    if (!sel) { renderAnalysis(); v.textContent = '–'; $('decision').className = 'decision no'; $('why').textContent = 'Tasvirdagi istalgan pikselga bosing.'; kv.innerHTML = ''; $('calc').textContent = ''; $('checks').innerHTML = ''; $('cells').innerHTML = ''; $('runCap').textContent = ''; return; }
     const [cx, cy] = sel, { t, N } = S, p = gray[cy * W + cx], hi = p + t, lo = p - t;
     const warm = css('--warm'), cool = css('--cool');
     const cls = new Array(16); let bm = 0, dm = 0;
@@ -625,6 +783,7 @@ input[type=file] { display: none; }
     $('checks').innerHTML = [['1. Tezkor test', c1], ['2. Segment test', c2], ['3. NMS', c3]].map(([h, [st, m]]) =>
       `<li>${ic(st)}<div><b>${h === '1. Tezkor test' ? '1. ' + tb('tezkor', 'Tezkor test') : h === '2. Segment test' ? '2. ' + tb('segment', 'Segment test') : '3. ' + tb('nms', 'NMS')}</b><span class="m">${m}</span></div></li>`).join('');
     $('tag').textContent = `p = (${cx}, ${cy}) · I = ${p}`;
+    renderAnalysis(cx, cy);
   }
 
   // ---------- threshold grafigi ----------
